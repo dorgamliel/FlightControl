@@ -11,48 +11,48 @@ namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FlightsController : ControllerBase
+    public class SegmentsController : ControllerBase
     {
-        private readonly FlightContext _context;
+        private readonly FlightDbContext _context;
 
-        public FlightsController(FlightContext context)
+        public SegmentsController(FlightDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/Flights
+        // GET: api/Segments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetFlights()
+        public async Task<ActionResult<IEnumerable<Segment>>> GetSegments()
         {
-            return await _context.Flights.ToListAsync();
+            return await _context.Segments.ToListAsync();
         }
 
-        // GET: api/Flights/5
+        // GET: api/Segments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Flight>> GetFlight(long id)
+        public async Task<ActionResult<Segment>> GetSegment(int id)
         {
-            var flight = await _context.Flights.FindAsync(id);
+            var segment = await _context.Segments.FindAsync(id);
 
-            if (flight == null)
+            if (segment == null)
             {
                 return NotFound();
             }
 
-            return flight;
+            return segment;
         }
 
-        // PUT: api/Flights/5
+        // PUT: api/Segments/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutFlight(long id, Flight flight)
+        public async Task<IActionResult> PutSegment(int id, Segment segment)
         {
-            if (id != flight.Flight_ID)
+            if (id != segment.ID)
             {
                 return BadRequest();
             }
 
-            _context.Entry(flight).State = EntityState.Modified;
+            _context.Entry(segment).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace FlightControlWeb.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!FlightExists(id))
+                if (!SegmentExists(id))
                 {
                     return NotFound();
                 }
@@ -73,36 +73,37 @@ namespace FlightControlWeb.Controllers
             return NoContent();
         }
 
-        // POST: api/Flights
+        // POST: api/Segments
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Flight>> PostFlight(Flight flight)
+        public async Task<ActionResult<Segment>> PostSegment(Segment segment)
         {
-            _context.Flights.Add(flight);
+            _context.Segments.Add(segment);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetFlight), new { id = flight.Flight_ID }, flight);
+
+            return CreatedAtAction("GetSegment", new { id = segment.ID }, segment);
         }
 
-        // DELETE: api/Flights/5
+        // DELETE: api/Segments/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Flight>> DeleteFlight(long id)
+        public async Task<ActionResult<Segment>> DeleteSegment(int id)
         {
-            var flight = await _context.Flights.FindAsync(id);
-            if (flight == null)
+            var segment = await _context.Segments.FindAsync(id);
+            if (segment == null)
             {
                 return NotFound();
             }
 
-            _context.Flights.Remove(flight);
+            _context.Segments.Remove(segment);
             await _context.SaveChangesAsync();
 
-            return flight;
+            return segment;
         }
 
-        private bool FlightExists(long id)
+        private bool SegmentExists(int id)
         {
-            return _context.Flights.Any(e => e.Flight_ID == id);
+            return _context.Segments.Any(e => e.ID == id);
         }
     }
 }
