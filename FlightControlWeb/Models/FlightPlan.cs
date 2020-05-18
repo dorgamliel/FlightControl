@@ -25,10 +25,9 @@ namespace FlightControlWeb.Models
     public class Segment
     {
         [Key]
-        [Newtonsoft.Json.JsonIgnore]
-        public int ID { get; set; }
+        //[Newtonsoft.Json.JsonIgnore]
+        public long ID { get; set; }
         public long Flight_ID { get; set; }
-        //public Coordinates Coordinates { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
         public int Timespan_Seconds { get; set; }
@@ -37,22 +36,11 @@ namespace FlightControlWeb.Models
     {
         [Key]
         [Newtonsoft.Json.JsonIgnore]
-        public int ID { get; set; }
+        public long ID { get; set; }
         [Newtonsoft.Json.JsonIgnore]
         public long Flight_ID { get; set; }
-        //public Coordinates Coordinates { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
         public DateTime Date_Time { get; set; }
-    }
-    public class Coordinates ///check if initial and segments coordinates should be two different properties.
-    {
-        [Key]
-        [Newtonsoft.Json.JsonIgnore]
-        public int ID { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        public long Flight_ID { get; set; }
-        public double Longitude { get; set; }
-        public double Latitude { get; set; }
     }
 }

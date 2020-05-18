@@ -6,42 +6,50 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
+using System.Collections.Immutable;
 
 namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FlightPlansController : ControllerBase
+    public class FlightPlanController : ControllerBase
     {
         private readonly FlightDbContext _context;
 
-        public FlightPlansController(FlightDbContext context)
+        public FlightPlanController(FlightDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/FlightPlans
+        // GET: api/FlightPlan
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightPlans()
+        public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightPlan()
         {
-            return await _context.FlightPlans.ToListAsync();
+            return await _context.FlightPlan.ToListAsync();
         }
 
-        // GET: api/FlightPlans/5
+        // GET: api/FlightPlan/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(long id)
         {
-            var flightPlan = await _context.FlightPlans.FindAsync(id);
-
+            List<Segment> segments = new List<Segment>();
+            var flightPlan = await _context.FlightPlan.FindAsync(id);
+            //Add segments and initial location which have the same Flight_ID as flight plan.
+            var seg = await _context.Segments.Where(x => x.Flight_ID == id).ToListAsync();
+            var loc = await _context.InitialLocation.Where(x => x.Flight_ID == id).ToListAsync();
             if (flightPlan == null)
             {
                 return NotFound();
             }
+            //Adding segment to flight plan.
+            flightPlan.Segments = seg;
+            //Adding initial location to flight plan
+            flightPlan.InitialLocation = loc.FirstOrDefault();
 
             return flightPlan;
         }
 
-        // PUT: api/FlightPlans/5
+        // PUT: api/FlightPlan/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
@@ -73,29 +81,37 @@ namespace FlightControlWeb.Controllers
             return NoContent();
         }
 
-        // POST: api/FlightPlans
+        // POST: api/FlightPlan
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan(FlightPlan flightPlan)
         {
-            _context.FlightPlans.Add(flightPlan);
+            //Adding flight ID for each segment which is related to flight plan.
+            foreach (Segment seg in flightPlan.Segments)
+            {
+                seg.Flight_ID = flightPlan.FlightID;
+            }
+            //Adding flight plan to current flights.
+            //_context.Flight.Add(new Flight()); ///add parameters.
+            flightPlan.InitialLocation.Flight_ID = flightPlan.FlightID;
+            _context.FlightPlan.Add(flightPlan);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFlightPlan", new { id = flightPlan.FlightID }, flightPlan);
         }
 
-        // DELETE: api/FlightPlans/5
+        // DELETE: api/FlightPlan/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<FlightPlan>> DeleteFlightPlan(long id)
         {
-            var flightPlan = await _context.FlightPlans.FindAsync(id);
+            var flightPlan = await _context.FlightPlan.FindAsync(id);
             if (flightPlan == null)
             {
                 return NotFound();
             }
 
-            _context.FlightPlans.Remove(flightPlan);
+            _context.FlightPlan.Remove(flightPlan);
             await _context.SaveChangesAsync();
 
             return flightPlan;
@@ -103,7 +119,7 @@ namespace FlightControlWeb.Controllers
 
         private bool FlightPlanExists(long id)
         {
-            return _context.FlightPlans.Any(e => e.FlightID == id);
+            return _context.FlightPlan.Any(e => e.FlightID == id);
         }
     }
 }
