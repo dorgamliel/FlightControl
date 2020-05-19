@@ -35,8 +35,8 @@ namespace FlightControlWeb.Controllers
             List<Segment> segments = new List<Segment>();
             var flightPlan = await _context.FlightPlan.FindAsync(id);
             //Add segments and initial location which have the same Flight_ID as flight plan.
-            var seg = await _context.Segments.Where(x => x.Flight_ID == id).ToListAsync();
-            var loc = await _context.InitialLocation.Where(x => x.Flight_ID == id).ToListAsync();
+            var seg = await _context.Segments.Where(x => x.FlightID == id).ToListAsync();
+            var loc = await _context.InitialLocation.Where(x => x.FlightID == id).ToListAsync();
             if (flightPlan == null)
             {
                 return NotFound();
@@ -91,11 +91,11 @@ namespace FlightControlWeb.Controllers
             //Adding flight ID for each segment which is related to flight plan.
             foreach (Segment seg in flightPlan.Segments)
             {
-                seg.Flight_ID = flightPlan.FlightID;
+                seg.FlightID = flightPlan.FlightID;
             }
             //Adding flight plan to current flights.
             //_context.Flight.Add(new Flight()); ///add parameters.
-            flightPlan.InitialLocation.Flight_ID = flightPlan.FlightID;
+            flightPlan.InitialLocation.FlightID = flightPlan.FlightID;
             _context.FlightPlan.Add(flightPlan);
             await _context.SaveChangesAsync();
 
