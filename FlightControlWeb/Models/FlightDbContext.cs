@@ -20,5 +20,6 @@ namespace FlightControlWeb.Models
         public DbSet<FlightPlan> FlightPlan { get; set; }
         public DbSet<InitialLocation> InitialLocation { get; set; }
         public DbSet<Flight> Flight { get; set; }
+        public DbSet<Server> Server { get; set; }
     }
 }

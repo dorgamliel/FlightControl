@@ -87,6 +87,7 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan(FlightPlan flightPlan)
         {
+            //DateTime dt = flightPlan.InitialLocation.Date_Time.ToString("");
             //Adding flight ID for each segment which is related to flight plan.
             foreach (Segment seg in flightPlan.Segments)
             {

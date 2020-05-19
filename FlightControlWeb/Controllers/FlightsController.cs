@@ -19,27 +19,32 @@ namespace FlightControlWeb.Controllers
         {
             _context = context;
         }
-
-       /* // GET: api/Flights
+        // GET: api/Flights?relative_to=<DATE_TIME>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Flight>>> GetFlight()
+        public async Task<ActionResult<List<FlightPlan>>> GetFlight(DateTime relative_to)
         {
-            return await _context.Flight.ToListAsync();
-        }*/
+            List<FlightPlan> activeFlights = new List<FlightPlan>();
+            foreach (var fp in _context.FlightPlan)
+            {
+                var seg = await _context.Segments.Where(x => x.Flight_ID == fp.FlightID).ToListAsync();
+                fp.Segments = seg;
+                //Getting departure time from each flight plan.
+                var location = await _context.InitialLocation.Where(x => x.Flight_ID == fp.FlightID).ToListAsync();
+                fp.InitialLocation = location.FirstOrDefault();
+                //If flight is active, add it to list of active flights.
+                if (IsActiveFlight(fp, relative_to))
+                {
+                    activeFlights.Add(fp);
+                }
+            }
 
-        /*// GET: api/Flights/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Flight>> GetFlight(long id)
-        {
-            var flight = await _context.Flight.FindAsync(id);
-
-            if (flight == null)
+            if (activeFlights == null)
             {
                 return NotFound();
             }
 
-            return flight;
-        }*/
+            return activeFlights;
+        }
 
         // PUT: api/Flights/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -116,32 +121,6 @@ namespace FlightControlWeb.Controllers
             return _context.Flight.Any(e => e.Flight_ID == id);
         }
 
-        // GET: api/Flights?relative_to=<DATE_TIME>
-        [HttpGet]
-        public async Task<ActionResult<List<FlightPlan>>> AbcFlight(DateTime relative_to)
-        {
-            List<FlightPlan> activeFlights = new List<FlightPlan>();
-            foreach (var fp in _context.FlightPlan)
-            {
-                var seg = await _context.Segments.Where(x => x.Flight_ID == fp.FlightID).ToListAsync();
-                fp.Segments = seg;
-                //Getting departure time from each flight plan.
-                var location = await _context.InitialLocation.Where(x => x.Flight_ID == fp.FlightID).ToListAsync(); 
-                fp.InitialLocation = location.FirstOrDefault();
-                //If flight is active, add it to list of active flights.
-                if (IsActiveFlight(fp, relative_to))
-                {
-                    activeFlights.Add(fp);
-                }
-            }
-
-            if (activeFlights == null)
-            {
-                return NotFound();
-            }
-
-            return activeFlights;
-        }
         public bool IsActiveFlight(FlightPlan fp, DateTime relative_to)
         {
             //If departure time precedes relative time.
