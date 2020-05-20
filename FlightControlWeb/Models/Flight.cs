@@ -23,7 +23,5 @@ namespace FlightControlWeb.Models
         public string CompanyName { get; set; }
         public DateTime Date_Time { get; set; }
         public bool Is_External { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        public Point Location { get; set; }
     }
 }

@@ -45,7 +45,9 @@ namespace FlightControlWeb.Controllers
                 if (IsActiveFlight(fp, fixedTime))
                 {
                     Flight flight = FlightPlanToFlight(fp);
-                    flight.Location = UpdateFlightLocation(fp, fixedTime);
+                    var tupleLocation = UpdateFlightLocation(fp, fixedTime);
+                    flight.Longitude = tupleLocation.Item1;
+                    flight.Latitude = tupleLocation.Item2;
                     activeFlights.Add(flight);
                 }
             }
@@ -161,7 +163,7 @@ namespace FlightControlWeb.Controllers
         //public void HandleExternalServers() {}
 
         //Update flight current location using linear interpulation.
-        public Point UpdateFlightLocation(FlightPlan fp, DateTime time)
+        public Tuple<double, double> UpdateFlightLocation(FlightPlan fp, DateTime time)
         {
             //Current segment and end of current segment.
             int index = getCurrentSegment(fp, time);
@@ -169,7 +171,7 @@ namespace FlightControlWeb.Controllers
             var difference = time.Ticks - FromDepatruteToSeg(fp, index).Ticks;
             //Distance (in seconds).
             var distance = TimeSpan.FromTicks(difference).TotalSeconds;
-            Point relativePoint = Interpolation(fp, index, distance);
+            Tuple<double, double> relativePoint = Interpolation(fp, index, distance);
             return relativePoint;
         }
         //Convert FlightLocation object to Flight object.
@@ -208,7 +210,7 @@ namespace FlightControlWeb.Controllers
             return -1;
         }
         //Get a point based on interpolation of two segments and x axis of desired point.
-        public Point Interpolation (FlightPlan fp, int index, double distance)
+        public Tuple<double, double> Interpolation (FlightPlan fp, int index, double distance)
         {
             Segment currSeg = null;
             if (index == 0)
@@ -220,13 +222,15 @@ namespace FlightControlWeb.Controllers
                 currSeg = fp.Segments[index - 1];
             }
             var endSeg = fp.Segments[index];
+            //All variables for interpolation.
             var x0 = currSeg.Longitude;
             var y0 = currSeg.Latitude;
             var x1 = endSeg.Longitude;
             var y1 = endSeg.Latitude;
             var x = x0 + distance / endSeg.Timespan_Seconds;
             var y = y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
-            Point point = new Point(Convert.ToInt32(x), Convert.ToInt32(y));
+            //Longitude and latitude of current flight.
+            var point = Tuple.Create(x, y);
             return point;
         }
         //Measurement of number of seconds since departure until reaching current segment.
