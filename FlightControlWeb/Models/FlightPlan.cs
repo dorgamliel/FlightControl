@@ -25,7 +25,7 @@ namespace FlightControlWeb.Models
     public class Segment
     {
         [Key]
-        //[Newtonsoft.Json.JsonIgnore]
+        [Newtonsoft.Json.JsonIgnore]
         public long ID { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
