@@ -165,9 +165,7 @@ namespace FlightControlWeb.Controllers
         {
             //Current segment and end of current segment.
             int index = getCurrentSegment(fp, time);
-            var currSeg = fp.Segments[index];
-            var endOfCurrSeg = fp.Segments[index + 1];
-            //Calculates the number of ticks since arriving to current segment.
+            //Calculates the number of ticks until arriving to current segment.
             var difference = time.Ticks - FromDepatruteToSeg(fp, index).Ticks;
             //Distance (in seconds).
             var distance = TimeSpan.FromTicks(difference).TotalSeconds;
@@ -212,13 +210,21 @@ namespace FlightControlWeb.Controllers
         //Get a point based on interpolation of two segments and x axis of desired point.
         public Point Interpolation (FlightPlan fp, int index, double distance)
         {
-            var currSeg = fp.Segments[index];
-            var endSeg = fp.Segments[index + 1];
+            Segment currSeg = null;
+            if (index == 0)
+            {
+                currSeg = InitLocationToSeg(fp);
+            }
+            else
+            {
+                currSeg = fp.Segments[index - 1];
+            }
+            var endSeg = fp.Segments[index];
             var x0 = currSeg.Longitude;
             var y0 = currSeg.Latitude;
             var x1 = endSeg.Longitude;
             var y1 = endSeg.Latitude;
-            var x = x0 + distance / currSeg.Timespan_Seconds;
+            var x = x0 + distance / endSeg.Timespan_Seconds;
             var y = y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
             Point point = new Point(Convert.ToInt32(x), Convert.ToInt32(y));
             return point;
@@ -233,6 +239,17 @@ namespace FlightControlWeb.Controllers
                 time = time.AddSeconds(fp.Segments[i].Timespan_Seconds);
             }
             return time;
+        }
+        //Create a segment based on flight plan initial location.
+        public Segment InitLocationToSeg(FlightPlan fp)
+        {
+            Segment seg = new Segment();
+            seg.FlightID = fp.FlightID;
+            seg.ID = -1;
+            seg.Latitude = fp.InitialLocation.Latitude;
+            seg.Longitude = fp.InitialLocation.Longitude;
+            seg.Timespan_Seconds = 0;
+            return seg;
         }
     }
 }
