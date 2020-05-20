@@ -25,7 +25,7 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightPlan()
         {
-            return await _context.FlightPlan.ToListAsync();
+            return await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
         }
 
         // GET: api/FlightPlan/5
@@ -33,19 +33,11 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(long id)
         {
             List<Segment> segments = new List<Segment>();
-            var flightPlan = await _context.FlightPlan.FindAsync(id);
-            //Add segments and initial location which have the same Flight_ID as flight plan.
-            var seg = await _context.Segments.Where(x => x.FlightID == id).ToListAsync();
-            var loc = await _context.InitialLocation.Where(x => x.FlightID == id).ToListAsync();
+            var flightPlan = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).Where(x => x.FlightID == id).FirstOrDefaultAsync();
             if (flightPlan == null)
             {
                 return NotFound();
             }
-            //Adding segment to flight plan.
-            flightPlan.Segments = seg;
-            //Adding initial location to flight plan
-            flightPlan.InitialLocation = loc.FirstOrDefault();
-
             return flightPlan;
         }
 
@@ -87,15 +79,6 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<FlightPlan>> PostFlightPlan(FlightPlan flightPlan)
         {
-            //DateTime dt = flightPlan.InitialLocation.Date_Time.ToString("");
-            //Adding flight ID for each segment which is related to flight plan.
-            foreach (Segment seg in flightPlan.Segments)
-            {
-                seg.FlightID = flightPlan.FlightID;
-            }
-            //Adding flight plan to current flights.
-            //_context.Flight.Add(new Flight()); ///add parameters.
-            flightPlan.InitialLocation.FlightID = flightPlan.FlightID;
             _context.FlightPlan.Add(flightPlan);
             await _context.SaveChangesAsync();
 
