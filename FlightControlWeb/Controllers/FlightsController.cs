@@ -202,7 +202,7 @@ namespace FlightControlWeb.Controllers
             Segment currSeg = null;
             if (index == 0)
             {
-                currSeg = InitLocationToSeg(fp);
+                currSeg = fp.Segments[0];
             }
             else
             {
