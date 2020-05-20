@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
+using System.Drawing;
 
 namespace FlightControlWeb.Controllers
 {
@@ -43,8 +44,8 @@ namespace FlightControlWeb.Controllers
                 //If flight is active, add it to list of active flights, with current location.
                 if (IsActiveFlight(fp, fixedTime))
                 {
-                    ///UpdateFlightLocation(fp);
                     Flight flight = FlightPlanToFlight(fp);
+                    flight.Location = UpdateFlightLocation(fp, fixedTime);
                     activeFlights.Add(flight);
                 }
             }
@@ -128,7 +129,7 @@ namespace FlightControlWeb.Controllers
         {
             return _context.Flight.Any(e => e.FlightID == id);
         }
-
+        //Checks if flight is active at given time.
         public bool IsActiveFlight(FlightPlan fp, DateTime fixedTime)
         {
             //If departure time precedes relative time.
@@ -139,6 +140,7 @@ namespace FlightControlWeb.Controllers
             }
             return false;
         }
+        //Checks if given flight is in given time span.
         public bool InTimeSpan(FlightPlan fp, DateTime fixedTime)
         {
             long totalTime = 0;
@@ -159,9 +161,18 @@ namespace FlightControlWeb.Controllers
         //public void HandleExternalServers() {}
 
         //Update flight current location using linear interpulation.
-        public void UpdateFlightLocation(FlightPlan fp)
+        public Point UpdateFlightLocation(FlightPlan fp, DateTime time)
         {
-            //starting point: beginning of segment being in.
+            //Current segment and end of current segment.
+            int index = getCurrentSegment(fp, time);
+            var currSeg = fp.Segments[index];
+            var endOfCurrSeg = fp.Segments[index + 1];
+            //Calculates the number of ticks since arriving to current segment.
+            var difference = time.Ticks - FromDepatruteToSeg(fp, index).Ticks;
+            //Distance (in seconds).
+            var distance = TimeSpan.FromTicks(difference).TotalSeconds;
+            Point relativePoint = Interpolation(fp, index, distance);
+            return relativePoint;
         }
         //Convert FlightLocation object to Flight object.
         public Flight FlightPlanToFlight(FlightPlan fp)
@@ -175,6 +186,53 @@ namespace FlightControlWeb.Controllers
             flight.Date_Time = fp.InitialLocation.Date_Time;
             flight.Is_External = false;
             return flight;
+        }
+        //Get segment which plane is in (relative to time).
+        public int getCurrentSegment(FlightPlan fp, DateTime time)
+        {
+            var difference = time.Ticks - fp.InitialLocation.Date_Time.Ticks;
+            var seconds = TimeSpan.FromTicks(difference).TotalSeconds;
+            int i = 0;
+            foreach (var seg in fp.Segments)
+            {
+                //If remaining seconds are greater than current timespan seconds.
+                if (seconds > seg.Timespan_Seconds)
+                {
+                    //Reduce remaining seconds (distance) from segment's seconds (distance).
+                    seconds -= seg.Timespan_Seconds;
+                } else
+                //Else, return index of desired segment.
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
+        //Get a point based on interpolation of two segments and x axis of desired point.
+        public Point Interpolation (FlightPlan fp, int index, double distance)
+        {
+            var currSeg = fp.Segments[index];
+            var endSeg = fp.Segments[index + 1];
+            var x0 = currSeg.Longitude;
+            var y0 = currSeg.Latitude;
+            var x1 = endSeg.Longitude;
+            var y1 = endSeg.Latitude;
+            var x = x0 + distance / currSeg.Timespan_Seconds;
+            var y = y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
+            Point point = new Point(Convert.ToInt32(x), Convert.ToInt32(y));
+            return point;
+        }
+        //Measurement of number of seconds since departure until reaching current segment.
+        public DateTime FromDepatruteToSeg(FlightPlan fp, int index)
+        {
+            int i;
+            DateTime time = fp.InitialLocation.Date_Time;
+            for (i = 0; i < index; i++)
+            {
+                time = time.AddSeconds(fp.Segments[i].Timespan_Seconds);
+            }
+            return time;
         }
     }
 }
