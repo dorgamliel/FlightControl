@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
-
+/*
 namespace FlightControlWeb.Controllers
 {
     [Route("api/[controller]")]
@@ -107,3 +107,4 @@ namespace FlightControlWeb.Controllers
         }
     }
 }
+*/

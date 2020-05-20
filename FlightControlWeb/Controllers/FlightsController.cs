@@ -91,21 +91,12 @@ namespace FlightControlWeb.Controllers
         {
             var fp = await _context.FlightPlan.FindAsync(id);
             var flight = await _context.Flight.FindAsync(id);
-            var loc = await _context.InitialLocation.Where(x => x.Flight_ID == id).ToListAsync();
-            var segs = await _context.Segments.Where(x => x.Flight_ID == id).ToListAsync();
-            var loc1 = loc.FirstOrDefault();
             if (fp == null)
             {
                 return NotFound();
             }
-            //Remove all related segments from db.
-            foreach (var segment in segs)
-            {
-                _context.Segments.Remove(segment);
-            }
-            _context.InitialLocation.Remove(loc1);
             _context.FlightPlan.Remove(fp);
-            //_context.Flight.Remove(flight);
+            _context.Flight.Remove(flight);
             await _context.SaveChangesAsync();
 
             return flight;
@@ -121,13 +112,8 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<List<FlightPlan>>> AbcFlight(DateTime relative_to)
         {
             List<FlightPlan> activeFlights = new List<FlightPlan>();
-            foreach (var fp in _context.FlightPlan)
+            foreach (var fp in _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation))
             {
-                var seg = await _context.Segments.Where(x => x.Flight_ID == fp.FlightID).ToListAsync();
-                fp.Segments = seg;
-                //Getting departure time from each flight plan.
-                var location = await _context.InitialLocation.Where(x => x.Flight_ID == fp.FlightID).ToListAsync(); 
-                fp.InitialLocation = location.FirstOrDefault();
                 //If flight is active, add it to list of active flights.
                 if (IsActiveFlight(fp, relative_to))
                 {
