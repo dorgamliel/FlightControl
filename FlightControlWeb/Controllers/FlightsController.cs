@@ -32,15 +32,11 @@ namespace FlightControlWeb.Controllers
             }
             List<Flight> activeFlights = new List<Flight>();
             //Iterate all planned fligts and add relevant to list.
-            foreach (var fp in _context.FlightPlan)
+            foreach (var fp in _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation))
             {
                 var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
                 ///var newfix = fixedTime.ToString("yyy-MM-ddTHH-mm:ssZ");   redundant?
-                var seg = await _context.Segments.Where(x => x.FlightID == fp.FlightID).ToListAsync();
-                fp.Segments = seg;
                 //Getting departure time from each flight plan.
-                var location = await _context.InitialLocation.Where(x => x.FlightID == fp.FlightID).ToListAsync();
-                fp.InitialLocation = location.FirstOrDefault();
                 //If flight is active, add it to list of active flights, with current location.
                 if (IsActiveFlight(fp, fixedTime))
                 {
@@ -206,7 +202,7 @@ namespace FlightControlWeb.Controllers
             Segment currSeg = null;
             if (index == 0)
             {
-                currSeg = InitLocationToSeg(fp);
+                currSeg = fp.Segments[0];
             }
             else
             {
@@ -239,7 +235,7 @@ namespace FlightControlWeb.Controllers
         public Segment InitLocationToSeg(FlightPlan fp)
         {
             Segment seg = new Segment();
-            seg.FlightID = fp.FlightID;
+            //seg.FlightID = fp.FlightID;
             seg.ID = -1;
             seg.Latitude = fp.InitialLocation.Latitude;
             seg.Longitude = fp.InitialLocation.Longitude;

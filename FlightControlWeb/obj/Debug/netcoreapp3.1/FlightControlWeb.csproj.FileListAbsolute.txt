@@ -280,7 +280,6 @@ C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\bi
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp2.0\System.Runtime.Caching.dll
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Runtime.Caching.dll
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.csprojAssemblyReference.cache
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.csproj.CoreCompileInputs.cache
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.AssemblyInfoInputs.cache
