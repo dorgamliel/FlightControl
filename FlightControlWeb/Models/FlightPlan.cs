@@ -11,9 +11,9 @@ namespace FlightControlWeb.Models
     public class FlightPlan
     {
         [Key]
-        [System.Text.Json.Serialization.JsonIgnore]
+        //[System.Text.Json.Serialization.JsonIgnore]
         [JsonPropertyName("flight_id")]
-        public string FlightID { get; set; } = GenerateFlightKey();
+        public string FlightID { get; set; } = "null";
         [JsonPropertyName("passengers")]
         public int Passengers { get; set; }
         [JsonPropertyName("company_name")]
@@ -34,6 +34,7 @@ namespace FlightControlWeb.Models
             randForChar = random.Next(0, 26);
             key += ((char)('A' + randForChar)).ToString();
             //Generate three numbers.
+            key += random.Next(0, 9).ToString();
             key += random.Next(0, 9).ToString();
             key += random.Next(0, 9).ToString();
             key += random.Next(0, 9).ToString();

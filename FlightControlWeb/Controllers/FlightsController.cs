@@ -35,8 +35,8 @@ namespace FlightControlWeb.Controllers
             {
                 var externalFlights = HandleExternalServers(relative_to);
                 activeFlights.AddRange(externalFlights);
-                //return x (just like  "return flight" in flightscontroller).
-                //return a LIST of all relevant flights rfom server. pay attention to relative time.
+                ///return x (just like  "return flight" in flightscontroller).
+                ///return a LIST of all relevant flights rfom server. pay attention to relative time.
             }
             var flightPlans = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
             //Iterate all planned fligts and add relevant to list.
@@ -62,23 +62,17 @@ namespace FlightControlWeb.Controllers
         }
         // DELETE: api/Flights/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Flight>> DeleteFlight(long id)
+        public async Task<ActionResult<FlightPlan>> DeleteFlight(string id)
         {
             var fp = await _context.FlightPlan.FindAsync(id);
-            var flight = await _context.Flight.FindAsync(id);
             if (fp == null)
             {
                 return NotFound();
             }
             _context.FlightPlan.Remove(fp);
-            _context.Flight.Remove(flight);
             await _context.SaveChangesAsync();
 
-            return flight;
-        }
-        private bool FlightExists(long id)
-        {
-            return _context.Flight.Any(e => String.Equals(e.FlightID, id));
+            return fp;
         }
         //Checks if flight is active at given time.
         public bool IsActiveFlight(FlightPlan fp, DateTime fixedTime)

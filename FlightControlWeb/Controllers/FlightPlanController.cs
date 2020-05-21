@@ -31,7 +31,7 @@ namespace FlightControlWeb.Controllers
 
         // GET: api/FlightPlan/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<FlightPlan>> GetFlightPlan(long id)
+        public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
             List<Segment> segments = new List<Segment>();
             var flightPlan = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).Where(x => String.Equals(id, x.FlightID)).FirstOrDefaultAsync();
@@ -47,12 +47,18 @@ namespace FlightControlWeb.Controllers
         public async Task<ActionResult<FlightPlan>> PostFlightPlan(FlightPlan flightPlan)
         {
             _context.FlightPlan.Add(flightPlan);
+            //Generate a unique key for new flight.
+            do
+            {
+                flightPlan.FlightID = FlightPlan.GenerateFlightKey();
+                //As long as generated key is identical to a key in DB, generate a new one.
+            } while (_context.FlightPlan.Count(x => x.FlightID == flightPlan.FlightID) > 0);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetFlightPlan", new { id = flightPlan.FlightID }, flightPlan);
         }
 
-        private bool FlightPlanExists(long id)
+        private bool FlightPlanExists(string id)
         {
             return _context.FlightPlan.Any(e => String.Equals(e.FlightID, id));
         }
