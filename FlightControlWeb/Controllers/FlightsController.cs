@@ -161,36 +161,7 @@ namespace FlightControlWeb.Controllers
             var set = _context.Server.Select(x => x.ServerURL).ToList();
             foreach (string address in set)
             {
-                string fullAdd = address + "api/Flights/?relative_to=" + time.ToString();
-                //Assigning API path.
-                string extURL = String.Format(fullAdd);
-                WebRequest request = WebRequest.Create(extURL);
-                request.Method = "GET";
-                HttpWebResponse response = null;
-                //Getting a response from external API.
-                response = (HttpWebResponse)request.GetResponse();
-                string test = null;
-                //Creating a stream object from external API response.
-                using (Stream stream = response.GetResponseStream())
-                {
-                    StreamReader sr = new StreamReader(stream);
-                    //Assigning JSON from external API to a string.
-                    test = sr.ReadToEnd();
-                    sr.Close();
-                }
-                var dezerializerSettings = new JsonSerializerSettings
-                {
-                    ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new SnakeCaseNamingStrategy()
-                    }
-                };
-                var extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(test, dezerializerSettings);
-                foreach (Flight flight in extSrvFlights)
-                {
-                    flight.IsExternal = true;
-                    allExtFlights.Add(flight);
-                }
+                allExtFlights.AddRange(GetFlightsFromExtServer(address, time));
             }
             return allExtFlights;
         }
@@ -287,6 +258,51 @@ namespace FlightControlWeb.Controllers
             seg.Longitude = fp.InitialLocation.Longitude;
             seg.TimespanSeconds = 0;
             return seg;
+        }
+        //Get all relevant flights according to given time, from a given address.
+        public List<Flight> GetFlightsFromExtServer(string address, DateTime time)
+        {
+            List<Flight> allExtFlights = new List<Flight>();
+            string fullAdd = address + "api/Flights/?relative_to=" + time.ToString();
+            //Get json string from external server.
+            string jsonText = GetJsonFromServer(fullAdd);
+            //Handling difference between class prop. names and json prop. names.
+            var dezerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
+            var extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, dezerializerSettings);
+            //Update flight as external and add to all active flights list.
+            foreach (Flight flight in extSrvFlights)
+            {
+                flight.IsExternal = true;
+                allExtFlights.Add(flight);
+            }
+            return allExtFlights;
+        }
+        //Getting Json string from given url address.
+        public string GetJsonFromServer(string fullAdd)
+        {
+            //Assigning API path.
+            string extURL = String.Format(fullAdd);
+            WebRequest request = WebRequest.Create(extURL);
+            request.Method = "GET";
+            HttpWebResponse response = null;
+            //Getting a response from external API.
+            response = (HttpWebResponse)request.GetResponse();
+            string jsonText = null;
+            //Creating a stream object from external API response.
+            using (Stream stream = response.GetResponseStream())
+            {
+                StreamReader sr = new StreamReader(stream);
+                //Assigning JSON from external API to a string.
+                jsonText = sr.ReadToEnd();
+                sr.Close();
+            }
+            return jsonText;
         }
     }
 }
