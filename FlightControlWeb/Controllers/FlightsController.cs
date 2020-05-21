@@ -38,11 +38,11 @@ namespace FlightControlWeb.Controllers
                 //return x (just like  "return flight" in flightscontroller).
                 //return a LIST of all relevant flights rfom server. pay attention to relative time.
             }
+            var flightPlans = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
             //Iterate all planned fligts and add relevant to list.
-            foreach (var fp in _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation))
+            foreach (var fp in flightPlans)
             {
                 var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
-                ///var newfix = fixedTime.ToString("yyy-MM-ddTHH-mm:ssZ");   redundant?
                 //Getting departure time from each flight plan.
                 //If flight is active, add it to list of active flights, with current location.
                 if (IsActiveFlight(fp, fixedTime))
@@ -60,51 +60,6 @@ namespace FlightControlWeb.Controllers
             }
             return activeFlights;
         }
-
-        // PUT: api/Flights/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFlight(long id, Flight flight)
-        {
-            if (id != flight.FlightID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(flight).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FlightExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Flights
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Flight>> PostFlight(Flight flight)
-        {
-            _context.Flight.Add(flight);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetFlight", new { id = flight.FlightID }, flight);
-        }
-
         // DELETE: api/Flights/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Flight>> DeleteFlight(long id)
@@ -123,7 +78,7 @@ namespace FlightControlWeb.Controllers
         }
         private bool FlightExists(long id)
         {
-            return _context.Flight.Any(e => e.FlightID == id);
+            return _context.Flight.Any(e => String.Equals(e.FlightID, id));
         }
         //Checks if flight is active at given time.
         public bool IsActiveFlight(FlightPlan fp, DateTime fixedTime)
@@ -165,7 +120,6 @@ namespace FlightControlWeb.Controllers
             }
             return allExtFlights;
         }
-
         //Update flight current location using linear interpulation.
         public Tuple<double, double> UpdateFlightLocation(FlightPlan fp, DateTime time)
         {
@@ -252,7 +206,6 @@ namespace FlightControlWeb.Controllers
         public Segment InitLocationToSeg(FlightPlan fp)
         {
             Segment seg = new Segment();
-            //seg.FlightID = fp.FlightID;
             seg.ID = -1;
             seg.Latitude = fp.InitialLocation.Latitude;
             seg.Longitude = fp.InitialLocation.Longitude;
@@ -263,6 +216,7 @@ namespace FlightControlWeb.Controllers
         public List<Flight> GetFlightsFromExtServer(string address, DateTime time)
         {
             List<Flight> allExtFlights = new List<Flight>();
+            //Making a string as a request for external server with a relative time.
             string fullAdd = address + "api/Flights/?relative_to=" + time.ToString();
             //Get json string from external server.
             string jsonText = GetJsonFromServer(fullAdd);
