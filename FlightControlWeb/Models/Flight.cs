@@ -21,7 +21,9 @@ namespace FlightControlWeb.Models
         [JsonPropertyName("company_name")]
 
         public string CompanyName { get; set; }
-        public DateTime Date_Time { get; set; }
-        public bool Is_External { get; set; }
+        [JsonPropertyName("date_time")]
+        public DateTime DateTime { get; set; }
+        [JsonPropertyName("is_external")]
+        public bool IsExternal { get; set; }
     }
 }

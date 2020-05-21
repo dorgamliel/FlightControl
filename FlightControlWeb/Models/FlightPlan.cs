@@ -29,7 +29,8 @@ namespace FlightControlWeb.Models
         public long ID { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public int Timespan_Seconds { get; set; }
+        [JsonPropertyName("timespan_seconds")]
+        public int TimespanSeconds { get; set; }
     }
     public class InitialLocation
     {
@@ -38,6 +39,7 @@ namespace FlightControlWeb.Models
         public long ID { get; set; }
         public double Longitude { get; set; }
         public double Latitude { get; set; }
-        public DateTime Date_Time { get; set; }
+        [JsonPropertyName("date_time")]
+        public DateTime DateTime { get; set; }
     }
 }

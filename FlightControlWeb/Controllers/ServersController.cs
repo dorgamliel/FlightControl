@@ -79,6 +79,11 @@ namespace FlightControlWeb.Controllers
         [HttpPost]
         public async Task<ActionResult<Server>> PostServer(Server server)
         {
+            //Adding slash if in the end of url.
+            if (server.ServerURL.Last() != '/')
+            {
+                server.ServerURL += "/";
+            }
             _context.Server.Add(server);
             try
             {
