@@ -291,3 +291,5 @@ C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\ob
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.dll
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.pdb
 C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.genruntimeconfig.cache
+C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\obj\Debug\netcoreapp3.1\FlightControlWeb.csprojAssemblyReference.cache
+C:\Users\SHRAGA SHOVAL\Source\Repos\dorgamliel\FlightControl\FlightControlWeb\bin\Debug\netcoreapp3.1\FlightControlWeb.Views.dll
