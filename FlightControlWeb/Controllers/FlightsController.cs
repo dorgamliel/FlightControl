@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
 using System.Drawing;
+using System.Net;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace FlightControlWeb.Controllers
 {
@@ -24,18 +28,21 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Flight>>> GetFlight(DateTime relative_to)
         {
+            List<Flight> activeFlights = new List<Flight>();
             //Check if "sync_all" query string was put.
             string queryStr = Request.QueryString.Value;
             if (queryStr.Contains("sync_all"))
             {
-                ///HandleExternalServers();
+                var externalFlights = HandleExternalServers(relative_to);
+                activeFlights.AddRange(externalFlights);
+                ///return x (just like  "return flight" in flightscontroller).
+                ///return a LIST of all relevant flights rfom server. pay attention to relative time.
             }
-            List<Flight> activeFlights = new List<Flight>();
+            var flightPlans = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
             //Iterate all planned fligts and add relevant to list.
-            foreach (var fp in _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation))
+            foreach (var fp in flightPlans)
             {
                 var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
-                ///var newfix = fixedTime.ToString("yyy-MM-ddTHH-mm:ssZ");   redundant?
                 //Getting departure time from each flight plan.
                 //If flight is active, add it to list of active flights, with current location.
                 if (IsActiveFlight(fp, fixedTime))
@@ -53,76 +60,25 @@ namespace FlightControlWeb.Controllers
             }
             return activeFlights;
         }
-
-        // PUT: api/Flights/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutFlight(long id, Flight flight)
-        {
-            if (id != flight.FlightID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(flight).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!FlightExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Flights
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Flight>> PostFlight(Flight flight)
-        {
-            _context.Flight.Add(flight);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetFlight", new { id = flight.FlightID }, flight);
-        }
-
         // DELETE: api/Flights/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Flight>> DeleteFlight(long id)
+        public async Task<ActionResult<FlightPlan>> DeleteFlight(string id)
         {
             var fp = await _context.FlightPlan.FindAsync(id);
-            var flight = await _context.Flight.FindAsync(id);
             if (fp == null)
             {
                 return NotFound();
             }
             _context.FlightPlan.Remove(fp);
-            _context.Flight.Remove(flight);
             await _context.SaveChangesAsync();
 
-            return flight;
-        }
-        private bool FlightExists(long id)
-        {
-            return _context.Flight.Any(e => e.FlightID == id);
+            return fp;
         }
         //Checks if flight is active at given time.
         public bool IsActiveFlight(FlightPlan fp, DateTime fixedTime)
         {
             //If departure time precedes relative time.
-            if (fp.InitialLocation.Date_Time.Ticks <= fixedTime.Ticks)
+            if (fp.InitialLocation.DateTime.Ticks <= fixedTime.Ticks)
             {
                 //Return true if flight hasn't finished yet.
                 return InTimeSpan(fp, fixedTime);
@@ -136,10 +92,10 @@ namespace FlightControlWeb.Controllers
             //Sum all segments timespan.
             foreach (var seg in fp.Segments)
             {
-                totalTime += seg.Timespan_Seconds;
+                totalTime += seg.TimespanSeconds;
             }
             //Add sum of segments timespan to initial time of departure.
-            DateTime time = fp.InitialLocation.Date_Time.AddSeconds(totalTime);
+            DateTime time = fp.InitialLocation.DateTime.AddSeconds(totalTime);
             //Check if a specific flight is in the required timespan.
             if (DateTime.Compare(time, fixedTime) > 0)
             {
@@ -147,8 +103,17 @@ namespace FlightControlWeb.Controllers
             }
             return false;
         }
-        //public void HandleExternalServers() {}
-
+        //Calling an external API.
+        public List<Flight> HandleExternalServers(DateTime time)
+        {
+            List<Flight> allExtFlights = new List<Flight>();
+            var set = _context.Server.Select(x => x.ServerURL).ToList();
+            foreach (string address in set)
+            {
+                allExtFlights.AddRange(GetFlightsFromExtServer(address, time));
+            }
+            return allExtFlights;
+        }
         //Update flight current location using linear interpulation.
         public Tuple<double, double> UpdateFlightLocation(FlightPlan fp, DateTime time)
         {
@@ -170,23 +135,23 @@ namespace FlightControlWeb.Controllers
             flight.Latitude = fp.InitialLocation.Latitude;
             flight.Passengers = fp.Passengers;
             flight.CompanyName = fp.CompanyName;
-            flight.Date_Time = fp.InitialLocation.Date_Time;
-            flight.Is_External = false;
+            flight.DateTime = fp.InitialLocation.DateTime;
+            flight.IsExternal = false;
             return flight;
         }
         //Get segment which plane is in (relative to time).
         public int getCurrentSegment(FlightPlan fp, DateTime time)
         {
-            var difference = time.Ticks - fp.InitialLocation.Date_Time.Ticks;
+            var difference = time.Ticks - fp.InitialLocation.DateTime.Ticks;
             var seconds = TimeSpan.FromTicks(difference).TotalSeconds;
             int i = 0;
             foreach (var seg in fp.Segments)
             {
                 //If remaining seconds are greater than current timespan seconds.
-                if (seconds > seg.Timespan_Seconds)
+                if (seconds > seg.TimespanSeconds)
                 {
                     //Reduce remaining seconds (distance) from segment's seconds (distance).
-                    seconds -= seg.Timespan_Seconds;
+                    seconds -= seg.TimespanSeconds;
                 } else
                 //Else, return index of desired segment.
                 {
@@ -202,7 +167,7 @@ namespace FlightControlWeb.Controllers
             Segment currSeg = null;
             if (index == 0)
             {
-                currSeg = fp.Segments[0];
+                currSeg = InitLocationToSeg(fp);
             }
             else
             {
@@ -214,7 +179,7 @@ namespace FlightControlWeb.Controllers
             var y0 = currSeg.Latitude;
             var x1 = endSeg.Longitude;
             var y1 = endSeg.Latitude;
-            var x = x0 + distance / endSeg.Timespan_Seconds;
+            var x = x0 + distance / endSeg.TimespanSeconds;
             var y = y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
             //Longitude and latitude of current flight.
             var point = Tuple.Create(x, y);
@@ -224,10 +189,10 @@ namespace FlightControlWeb.Controllers
         public DateTime FromDepatruteToSeg(FlightPlan fp, int index)
         {
             int i;
-            DateTime time = fp.InitialLocation.Date_Time;
+            DateTime time = fp.InitialLocation.DateTime;
             for (i = 0; i < index; i++)
             {
-                time = time.AddSeconds(fp.Segments[i].Timespan_Seconds);
+                time = time.AddSeconds(fp.Segments[i].TimespanSeconds);
             }
             return time;
         }
@@ -235,12 +200,57 @@ namespace FlightControlWeb.Controllers
         public Segment InitLocationToSeg(FlightPlan fp)
         {
             Segment seg = new Segment();
-            //seg.FlightID = fp.FlightID;
             seg.ID = -1;
             seg.Latitude = fp.InitialLocation.Latitude;
             seg.Longitude = fp.InitialLocation.Longitude;
-            seg.Timespan_Seconds = 0;
+            seg.TimespanSeconds = 0;
             return seg;
+        }
+        //Get all relevant flights according to given time, from a given address.
+        public List<Flight> GetFlightsFromExtServer(string address, DateTime time)
+        {
+            List<Flight> allExtFlights = new List<Flight>();
+            //Making a string as a request for external server with a relative time.
+            string fullAdd = address + "api/Flights/?relative_to=" + time.ToString();
+            //Get json string from external server.
+            string jsonText = GetJsonFromServer(fullAdd);
+            //Handling difference between class prop. names and json prop. names.
+            var dezerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
+            var extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, dezerializerSettings);
+            //Update flight as external and add to all active flights list.
+            foreach (Flight flight in extSrvFlights)
+            {
+                flight.IsExternal = true;
+                allExtFlights.Add(flight);
+            }
+            return allExtFlights;
+        }
+        //Getting Json string from given url address.
+        public string GetJsonFromServer(string fullAdd)
+        {
+            //Assigning API path.
+            string extURL = String.Format(fullAdd);
+            WebRequest request = WebRequest.Create(extURL);
+            request.Method = "GET";
+            HttpWebResponse response = null;
+            //Getting a response from external API.
+            response = (HttpWebResponse)request.GetResponse();
+            string jsonText = null;
+            //Creating a stream object from external API response.
+            using (Stream stream = response.GetResponseStream())
+            {
+                StreamReader sr = new StreamReader(stream);
+                //Assigning JSON from external API to a string.
+                jsonText = sr.ReadToEnd();
+                sr.Close();
+            }
+            return jsonText;
         }
     }
 }

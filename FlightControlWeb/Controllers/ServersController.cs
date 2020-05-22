@@ -27,58 +27,16 @@ namespace FlightControlWeb.Controllers
             return await _context.Server.ToListAsync();
         }
 
-        // GET: api/Servers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Server>> GetServer(string id)
-        {
-            var server = await _context.Server.FindAsync(id);
-
-            if (server == null)
-            {
-                return NotFound();
-            }
-
-            return server;
-        }
-
-        // PUT: api/Servers/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutServer(string id, Server server)
-        {
-            if (id != server.ServerID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(server).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ServerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
         // POST: api/Servers
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+
         [HttpPost]
         public async Task<ActionResult<Server>> PostServer(Server server)
         {
+            //Adding slash if in the end of url.
+            if (server.ServerURL.Last() != '/')
+            {
+                server.ServerURL += "/";
+            }
             _context.Server.Add(server);
             try
             {

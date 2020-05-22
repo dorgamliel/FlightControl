@@ -13,15 +13,18 @@ namespace FlightControlWeb.Models
     {
         [Key]
         [JsonPropertyName("flight_id")]
-
-        public long FlightID { get; set; }
+        public string FlightID { get; set; }
+        [JsonPropertyName("longitude")]
         public double Longitude { get; set; }
+        [JsonPropertyName("latitude")]
         public double Latitude { get; set; }
+        [JsonPropertyName("passengers")]
         public int Passengers { get; set; }
         [JsonPropertyName("company_name")]
-
         public string CompanyName { get; set; }
-        public DateTime Date_Time { get; set; }
-        public bool Is_External { get; set; }
+        [JsonPropertyName("date_time")]
+        public DateTime DateTime { get; set; }
+        [JsonPropertyName("is_external")]
+        public bool IsExternal { get; set; }
     }
 }
