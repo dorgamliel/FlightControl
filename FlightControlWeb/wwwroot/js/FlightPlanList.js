@@ -1,14 +1,34 @@
 ﻿document.getElementById("demo").innerHTML = "working"
 let t = new Date().toISOString();
 
-function submit() {
+async function updateFlightList() {
     let t = new Date().toISOString();
-    let request = new Request('/api/Flight/' + t);
+    let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
     let flightList
-    fetch(request)
-        // reads the body of the response as json
-        .then(response => response.json())
-        .then(response => flightList = JSON.parse(JSON.stringify(response)))
-        .then(response => document.getElementById("flightList").innerHTML = JSON.stringify(flightList))
-        .catch(error => console.log(error))
+    let response = await fetch(request)
+    response = await response.json();
+    flightList = JSON.parse(JSON.stringify(response));
+    printFlightList(flightList);
+}
+
+
+function printFlightList(flightList) {
+    
+    let HTMLFlightList = document.getElementById("flightList");
+    HTMLFlightList.innerHTML = '';
+    for (flight of flightList) {
+        let newFlight = document.createElement('li');
+        let flightID = document.createElement('p');
+        let airline = document.createElement('p');
+        flightID.innerHTML = 'Flight ID: ' + JSON.stringify(flight.flight_id);
+        airline.innerHTML = 'Airline: ' + JSON.stringify(flight.company_name);
+        newFlight.append(flightID);
+        newFlight.append(airline);
+        HTMLFlightList.append(newFlight);
+    }
+}
+
+function displayCurrentFlightPlan(flight) {
+    let currentFlightPlan = document.getElementById("currentFlightPlan");
+    currentFlightPlan.innerHTML = '';
 }

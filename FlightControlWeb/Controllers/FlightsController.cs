@@ -28,21 +28,13 @@ namespace FlightControlWeb.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Flight>>> GetFlight(DateTime relative_to)
         {
+            var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
             List<Flight> activeFlights = new List<Flight>();
             //Check if "sync_all" query string was put.
-            string queryStr = Request.QueryString.Value;
-            if (queryStr.Contains("sync_all"))
-            {
-                var externalFlights = HandleExternalServers(relative_to);
-                activeFlights.AddRange(externalFlights);
-                ///return x (just like  "return flight" in flightscontroller).
-                ///return a LIST of all relevant flights rfom server. pay attention to relative time.
-            }
             var flightPlans = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
             //Iterate all planned fligts and add relevant to list.
             foreach (var fp in flightPlans)
             {
-                var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
                 //Getting departure time from each flight plan.
                 //If flight is active, add it to list of active flights, with current location.
                 if (IsActiveFlight(fp, fixedTime))
@@ -53,6 +45,14 @@ namespace FlightControlWeb.Controllers
                     flight.Latitude = tupleLocation.Item2;
                     activeFlights.Add(flight);
                 }
+            }
+            string queryStr = Request.QueryString.Value;
+            if (queryStr.Contains("sync_all"))
+            {
+                var externalFlights = HandleExternalServers(fixedTime);
+                activeFlights.AddRange(externalFlights);
+                ///return x (just like  "return flight" in flightscontroller).
+                ///return a LIST of all relevant flights rfom server. pay attention to relative time.
             }
             if (activeFlights == null)
             {
@@ -174,13 +174,14 @@ namespace FlightControlWeb.Controllers
                 currSeg = fp.Segments[index - 1];
             }
             var endSeg = fp.Segments[index];
+            var relativeTimeInSeg = distance / endSeg.TimespanSeconds;
             //All variables for interpolation.
             var x0 = currSeg.Longitude;
             var y0 = currSeg.Latitude;
             var x1 = endSeg.Longitude;
             var y1 = endSeg.Latitude;
-            var x = x0 + distance / endSeg.TimespanSeconds;
-            var y = y0 + (y1 - y0) * ((x - x0) / (x1 - x0));
+            var x = x0 + ((x1 - x0) / relativeTimeInSeg);
+            var y = y0 + ((y1 - y0) / relativeTimeInSeg);
             //Longitude and latitude of current flight.
             var point = Tuple.Create(x, y);
             return point;
@@ -211,7 +212,7 @@ namespace FlightControlWeb.Controllers
         {
             List<Flight> allExtFlights = new List<Flight>();
             //Making a string as a request for external server with a relative time.
-            string fullAdd = address + "api/Flights/?relative_to=" + time.ToString();
+            string fullAdd = address + "api/Flights/?relative_to=" + time.ToString("yyyy-MM-ddTHH:mm:ssZ");
             //Get json string from external server.
             string jsonText = GetJsonFromServer(fullAdd);
             //Handling difference between class prop. names and json prop. names.
