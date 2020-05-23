@@ -3,7 +3,7 @@ let t = new Date().toISOString();
 
 function submit() {
     let t = new Date().toISOString();
-    let request = new Request('/api/Flight/' + t);
+    let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
     let flightList
     fetch(request)
         // reads the body of the response as json
