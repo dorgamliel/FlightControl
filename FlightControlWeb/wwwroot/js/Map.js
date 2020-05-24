@@ -1,6 +1,4 @@
-﻿let intervalID = window.setInterval(addOrUpdateMarker, 200);
-
-function initMap() {
+﻿function initMap() {
     //Map properties.
     let properties = {
         zoom: 13,
@@ -35,27 +33,18 @@ function addMarker(props) {
 }
 
 //Adding/Updating markers in map.
-async function addOrUpdateMarker() {
-    let t = new Date().toISOString();
-    let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
-    let flightList
-    let response = await fetch(request)
-    response = await response.json();
-    flightList = JSON.parse(JSON.stringify(response));
-    for (let i = 0; i < flightList.length; i++) {
-        //Add if new flight.
-        if (window.markers.filter(x => x.id === flightList[i].flight_id).length == 0) {
-            addMarker({
-                coords: { lat: flightList[i].latitude, lng: flightList[i].longitude },
-                content: flightList[i].company_name,
-                id: flightList[i].flight_id
-            });
-        //If not new, update existing marker location.
-        } else  {
-            window.markers[i].setPosition({ lat: flightList[i].latitude, lng: flightList[i].longitude });
+function addOrUpdateMarker(flight) {
+    for (marker of window.markers) {
+        if (marker.id == flight.flight_id) {
+            marker.setPosition({ lat: flight.latitude, lng: flight.longitude });
+            return;
         }
     }
-    removeUnactiveFlights(flightList);
+    addMarker({
+        coords: { lat: flight.latitude, lng: flight.longitude },
+        content: flight.company_name,
+        id: flight.flight_id
+    });
 }
 
 //Removing unactive flights from map.
@@ -69,4 +58,8 @@ function removeUnactiveFlights(flightList) {
             i--;
         }
     }
+}
+
+function f1() {
+    let x = 0;
 }

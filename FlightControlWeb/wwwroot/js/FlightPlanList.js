@@ -10,6 +10,8 @@ async function updateFlightList() {
     response = await response.json();
     flightList = JSON.parse(JSON.stringify(response));
     printFlightList(flightList);
+    removeUnactiveFlights(flightList);
+    setTimeout(updateFlightList, 3000);
 }
 
 
@@ -31,8 +33,8 @@ function printFlightList(flightList) {
         newFlight.append(flightID);
         newFlight.append(airline);
         HTMLFlightList.append(newFlight);
+        addOrUpdateMarker(flight);
     }
-    setTimeout(updateFlightList, 3000);
 }
 
 async function displayCurrentFlightPlan(flight) {
