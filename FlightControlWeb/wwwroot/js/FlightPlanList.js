@@ -1,5 +1,6 @@
 ﻿document.getElementById("demo").innerHTML = "working"
 let t = new Date().toISOString();
+updateFlightList();
 
 async function updateFlightList() {
     let t = new Date().toISOString();
@@ -13,7 +14,6 @@ async function updateFlightList() {
 
 
 function printFlightList(flightList) {
-    
     let HTMLFlightList = document.getElementById("flightList");
     HTMLFlightList.innerHTML = '';
     for (flight of flightList) {
@@ -32,6 +32,7 @@ function printFlightList(flightList) {
         newFlight.append(airline);
         HTMLFlightList.append(newFlight);
     }
+    setTimeout(updateFlightList, 3000);
 }
 
 async function displayCurrentFlightPlan(flight) {
@@ -84,3 +85,4 @@ function getArrivalTime(segments) {
     }
     return flightTime;
 }
+
