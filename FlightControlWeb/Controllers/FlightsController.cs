@@ -30,7 +30,6 @@ namespace FlightControlWeb.Controllers
         {
             var fixedTime = TimeZoneInfo.ConvertTimeToUtc(relative_to);
             List<Flight> activeFlights = new List<Flight>();
-            //Check if "sync_all" query string was put.
             var flightPlans = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
             //Iterate all planned fligts and add relevant to list.
             foreach (var fp in flightPlans)
@@ -47,6 +46,7 @@ namespace FlightControlWeb.Controllers
                 }
             }
             string queryStr = Request.QueryString.Value;
+            //Check if "sync_all" query string was put.
             if (queryStr.Contains("sync_all"))
             {
                 var externalFlights = HandleExternalServers(fixedTime);
@@ -114,12 +114,12 @@ namespace FlightControlWeb.Controllers
             }
             return allExtFlights;
         }
-        //Update flight current location using linear interpulation.
+        //Update flight current location using linear interpolation.
         public Tuple<double, double> UpdateFlightLocation(FlightPlan fp, DateTime time)
         {
-            //Current segment and end of current segment.
+            //Current segment flight is in.
             int index = getCurrentSegment(fp, time);
-            //Calculates the number of ticks until arriving to current segment.
+            //The difference of Current check time and the time when arriving to current segment.
             var difference = time.Ticks - FromDepatruteToSeg(fp, index).Ticks;
             //Distance (in seconds).
             var distance = TimeSpan.FromTicks(difference).TotalSeconds;
@@ -174,7 +174,7 @@ namespace FlightControlWeb.Controllers
                 currSeg = fp.Segments[index - 1];
             }
             var endSeg = fp.Segments[index];
-            var relativeTimeInSeg = distance / endSeg.TimespanSeconds;
+            var relativeTimeInSeg = endSeg.TimespanSeconds / distance;
             //All variables for interpolation.
             var x0 = currSeg.Longitude;
             var y0 = currSeg.Latitude;
