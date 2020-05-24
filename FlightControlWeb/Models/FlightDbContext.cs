@@ -18,5 +18,6 @@ namespace FlightControlWeb.Models
         }
         public DbSet<FlightPlan> FlightPlan { get; set; }
         public DbSet<Server> Server { get; set; }
+        public DbSet<IDToServer> IdToServer { get; set; }
     }
 }

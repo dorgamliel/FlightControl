@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>hello world!</title>
 </head>
-<body onload="updateFlightList()">
+<body>
     <h1 id ="demo">Hello World!</h1>
     <iframe src="Map.html" frameborder="0" height="500" width="1100"></iframe>
     <div>
@@ -13,9 +13,38 @@
         </ul>
     </div>
 
-    <div id="curentFlightPlan">
-
+    <div id="currentFlightPlan" style="display: none;">
+        <div>
+            <ul id="flightDetails">
+                <li id="flightID"></li>
+                <li id="airline"></li>
+                <li id="passengers"></li>
+            </ul>
+        </div>
+        <div>
+            <ul id="flightPath">
+                <li id="origin">
+                    <ul>Origin:
+                        <li id="originLongitude"></li>
+                        <li id="originLatitude"></li>
+                    </ul>
+                </li>
+                <li id="destination">
+                    <ul>Destination:
+                        <li id="destLongitude"></li>
+                        <li id="destLatitude"></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div id="flightTime">
+            <ul>
+                <li id="departureTime"></li>
+                <li id="arrivalTime"></li>
+            </ul>
+        </div>
     </div>
+    <div id="errorMsg" style="display: none"></div>
     <script src="/js/FlightPlanList.js"></script>
 </body>
 </html>

@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FlightControlWeb.Models;
 using System.Collections.Immutable;
+using System.Net;
+using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace FlightControlWeb.Controllers
 {
@@ -33,13 +37,27 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
-            List<Segment> segments = new List<Segment>();
             var flightPlan = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).Where(x => String.Equals(id, x.FlightID)).FirstOrDefaultAsync();
-            if (flightPlan == null)
+            if (flightPlan != null)
+            {
+                return flightPlan;
+            }
+            //TODO: handle case where infinite loop may happen.
+            var address = await Task.Run(() => FindFlightServer(id));
+            var response = await Task.Run(() => GetFlightPlanFromExtServer(address, id));
+            try
+            {
+                flightPlan = ParseFlightPlanFromResponse(response);
+                if (flightPlan.FlightID.Equals("null"))
+                {
+                    flightPlan.FlightID = id;
+                }
+                return flightPlan;
+            }
+            catch
             {
                 return NotFound();
             }
-            return flightPlan;
         }
 
         // POST: api/FlightPlan
@@ -61,6 +79,46 @@ namespace FlightControlWeb.Controllers
         private bool FlightPlanExists(string id)
         {
             return _context.FlightPlan.Any(e => String.Equals(e.FlightID, id));
+        }
+
+        private string FindFlightServer(string id)
+        {
+            var serverURL = _context.IdToServer.Find(id);
+            return serverURL.ServerURL;
+        }
+
+        private HttpWebResponse GetFlightPlanFromExtServer(string address, string id)
+        {
+            var fullAddress = address + "api/FlightPlan/" + id;
+            string extURL = String.Format(fullAddress);
+            WebRequest request = WebRequest.Create(extURL);
+            request.Method = "GET";
+            HttpWebResponse response = null;
+            //Getting a response from external API.
+            response = (HttpWebResponse)request.GetResponse();
+            return response;
+        }
+
+        private FlightPlan ParseFlightPlanFromResponse(HttpWebResponse response)
+        {
+            string jsonText = null;
+            //Creating a stream object from external API response.
+            using (Stream stream = response.GetResponseStream())
+            {
+                StreamReader sr = new StreamReader(stream);
+                //Assigning JSON from external API to a string.
+                jsonText = sr.ReadToEnd();
+                sr.Close();
+            }
+            var dezerializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
+            var flightPlan = JsonConvert.DeserializeObject<FlightPlan>(jsonText, dezerializerSettings);
+            return flightPlan;
         }
     }
 }
