@@ -86,3 +86,30 @@ function getArrivalTime(segments) {
     return flightTime;
 }
 
+
+function allowDrop(event) {
+    event.preventDefault();
+}
+
+function drop(event) {
+    event.preventDefault();
+    let files = event.dataTransfer.files;
+    let reader = new FileReader();
+    reader.onload = function () {
+        postFlightFromFile(reader.result);
+    }
+    for (file of files) {
+        reader.readAsText(file);
+        var x = 0;
+    }
+}
+
+async function postFlightFromFile(fileData) {
+    var xhttp = new XMLHttpRequest();
+    await xhttp.open("POST", "api/FlightPlan", true);
+    xhttp.setRequestHeader("Content-Type", "application/json")
+    var str = 'hi';
+    let car = (JSON.stringify(fileData));
+    await xhttp.send(fileData);
+}
+
