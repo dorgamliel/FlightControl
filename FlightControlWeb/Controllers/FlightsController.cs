@@ -223,13 +223,28 @@ namespace FlightControlWeb.Controllers
                     NamingStrategy = new SnakeCaseNamingStrategy()
                 }
             };
-            var extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, dezerializerSettings);
+            List<Flight> extSrvFlights;
+            try
+            {
+                extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, dezerializerSettings);
+            } catch
+            {
+                return allExtFlights;
+            }
             //Update flight as external and add to all active flights list.
             foreach (Flight flight in extSrvFlights)
             {
                 flight.IsExternal = true;
                 allExtFlights.Add(flight);
+                if (!_context.IdToServer.Any(e => e.FlightID.Equals(flight.FlightID)))
+                {
+                    var idToServer = new IDToServer();
+                    idToServer.FlightID = flight.FlightID;
+                    idToServer.ServerURL = address;
+                    _context.IdToServer.Add(idToServer);
+                }
             }
+            _context.SaveChanges();
             return allExtFlights;
         }
         //Getting Json string from given url address.

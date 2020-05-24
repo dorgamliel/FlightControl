@@ -66,7 +66,7 @@ namespace FlightControlWeb.Controllers
             {
                 return NotFound();
             }
-
+            DeleteServerFlights(server.ServerURL);
             _context.Server.Remove(server);
             await _context.SaveChangesAsync();
 
@@ -76,6 +76,14 @@ namespace FlightControlWeb.Controllers
         private bool ServerExists(string id)
         {
             return _context.Server.Any(e => e.ServerID == id);
+        }
+
+        private void DeleteServerFlights(string serverURL)
+        {
+            foreach (var item in _context.IdToServer.Where(x => x.ServerURL == serverURL).ToList())
+            {
+                _context.IdToServer.Remove(item);
+            }
         }
     }
 }
