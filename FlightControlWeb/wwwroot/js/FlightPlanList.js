@@ -1,5 +1,4 @@
-﻿let intervalID = window.setInterval(updateFlightList, 200);
-document.getElementById("demo").innerHTML = "working"
+﻿document.getElementById("demo").innerHTML = "working"
 let t = new Date().toISOString();
 updateFlightList();
 
