@@ -36,13 +36,22 @@ function printFlightList(flightList) {
         addOrUpdateMarker(flight, newFlight);
     }
 }
+async function getSeg(flight) {
+    let flightID = JSON.parse(flight.children[0].innerHTML);
+    let request = new Request('/api/FlightPlan/' + flightID);
+    let response = await fetch(request);
+    response = await response.json();
+    return JSON.parse(JSON.stringify(response));
+}
 
-async function displayCurrentFlightPlan(flight) {
+async function displayCurrentFlightPlan(flight, flightPath) {
     let flightID = JSON.parse(flight.children[0].innerHTML);
     let request = new Request('/api/FlightPlan/' + flightID);
     let response = await fetch(request);
     response = await response.json();
     let flightPlan = JSON.parse(JSON.stringify(response));
+    flightPath = createFlightPath(flightPlan, flightPath);
+    printSegments(flightPlan, flightPath);
     try {
         assignFlightPathView(flightPlan);
         document.getElementById('errorMsg').style.display = 'initial';
@@ -53,8 +62,25 @@ async function displayCurrentFlightPlan(flight) {
         error.innerHTML = 'ERROR: could not find flight details.';
         error.style.display = 'initial';
     }
+    return flightPath;
 }
 
+function createFlightPath(flightPlan, flightPath) {
+    /*var flightPlanCoordinates = [
+        { lat: 32.0055, lng: 34.8854 },
+        { lat: 32.005859, lng: 34.855610 },
+        { lat: -18.142, lng: 178.431 },
+        { lat: -27.467, lng: 153.027 }
+    ];
+    var flightPath = new google.maps.Polyline({
+        path: flightPlanCoordinates,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });*/
+    return flightPath;
+}
 
 function assignFlightPathView(flightPlan) {
     let airline = flightPlan.company_name;

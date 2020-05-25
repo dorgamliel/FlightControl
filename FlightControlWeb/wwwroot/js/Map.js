@@ -8,6 +8,7 @@
     window.map = new google.maps.Map(document.getElementById('map'), properties);
     //Array of markers.
     window.markers = [];
+    
 }
 
 //Add Marker function.
@@ -20,16 +21,56 @@ function addMarker(props, newFlight) {
     });
     //Adding a marker to list of map markers.
     window.markers.push(marker);
+    let clicked = false;
+    let infoWindow;
+    var flightPlanCoordinates = [
+        { lat: 32.0055, lng: 34.8854 },
+        { lat: 32.005859, lng: 34.855610 },
+        { lat: -18.142, lng: 178.431 },
+        { lat: -27.467, lng: 153.027 }
+    ];
+    var flightPath = new google.maps.Polyline({
+        path: flightPlanCoordinates,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2
+    });
+    marker.addListener('click', function () {
+            //Buttons first click.
+            if (clicked == false) {
+                clicked = true;
+                infoWindow.open(map, marker);
+                displayCurrentFlightPlan(newFlight, flightPath);
+                marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
+                
+                //flightPath.setMap(map);
+                //Button second click ("disable").
+            } else {
+                clicked = false;
+                infoWindow.close(map, marker);
+                //displayCurrentFlightPlan(newFlight);
+                marker.setIcon('https://www.google.com/mapfiles/marker_yellow.png');
+                printSegments(null, flightPath);
+
+            }
+    });
 
     //Adds content if exists.
     if (props.content) {
-        let infoWindow = new google.maps.InfoWindow({
+        infoWindow = new google.maps.InfoWindow({
             content: props.content
         });
-        marker.addListener('click', function () {
-            infoWindow.open(map, marker);
-            displayCurrentFlightPlan(newFlight);
-        });
+    }
+
+}
+
+function printSegments(flightPlan, flightPath) {
+    
+    if (flightPlan == null) {
+        flightPath.setMap(null);
+    } else {
+        flightPath.setMap(window.map);
     }
 }
 
