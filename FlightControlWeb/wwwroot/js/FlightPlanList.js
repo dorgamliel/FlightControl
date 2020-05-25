@@ -67,6 +67,8 @@ async function displayCurrentFlightPlan(flight, flightPath) {
 
 function createFlightPath(flightPlan, flightPath) {
     let arr = [];
+    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
+    arr.push(coupl);
     for (let i = 0; i < flightPlan.segments.length; i++) {
         let segPoint = flightPlan.segments[i];
         let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude};
