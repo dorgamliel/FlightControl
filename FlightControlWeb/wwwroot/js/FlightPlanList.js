@@ -66,19 +66,13 @@ async function displayCurrentFlightPlan(flight, flightPath) {
 }
 
 function createFlightPath(flightPlan, flightPath) {
-    /*var flightPlanCoordinates = [
-        { lat: 32.0055, lng: 34.8854 },
-        { lat: 32.005859, lng: 34.855610 },
-        { lat: -18.142, lng: 178.431 },
-        { lat: -27.467, lng: 153.027 }
-    ];
-    var flightPath = new google.maps.Polyline({
-        path: flightPlanCoordinates,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
-    });*/
+    let arr = [];
+    for (let i = 0; i < flightPlan.segments.length; i++) {
+        let segPoint = flightPlan.segments[i];
+        let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude};
+        arr.push(couple);
+    }
+    flightPath.setPath(arr);
     return flightPath;
 }
 

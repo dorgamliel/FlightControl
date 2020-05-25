@@ -23,19 +23,14 @@ function addMarker(props, newFlight) {
     window.markers.push(marker);
     let clicked = false;
     let infoWindow;
-    var flightPlanCoordinates = [
-        { lat: 32.0055, lng: 34.8854 },
-        { lat: 32.005859, lng: 34.855610 },
-        { lat: -18.142, lng: 178.431 },
-        { lat: -27.467, lng: 153.027 }
-    ];
     var flightPath = new google.maps.Polyline({
-        path: flightPlanCoordinates,
+        //path: flightPlanCoordinates,
         geodesic: true,
         strokeColor: '#FF0000',
         strokeOpacity: 1.0,
         strokeWeight: 2
     });
+    //flightPath.setPath(flightPlanCoordinates);
     marker.addListener('click', function () {
             //Buttons first click.
             if (clicked == false) {
