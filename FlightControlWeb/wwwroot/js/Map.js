@@ -11,7 +11,7 @@
 }
 
 //Add Marker function.
-function addMarker(props) {
+function addMarker(props, newFlight) {
     let marker = new google.maps.Marker({
         id: props.id,
         position: props.coords,
@@ -28,12 +28,13 @@ function addMarker(props) {
         });
         marker.addListener('click', function () {
             infoWindow.open(map, marker);
+            displayCurrentFlightPlan(newFlight);
         });
     }
 }
 
 //Adding/Updating markers in map.
-function addOrUpdateMarker(flight) {
+function addOrUpdateMarker(flight, newFlight) {
     for (marker of window.markers) {
         if (marker.id == flight.flight_id) {
             marker.setPosition({ lat: flight.latitude, lng: flight.longitude });
@@ -44,7 +45,7 @@ function addOrUpdateMarker(flight) {
         coords: { lat: flight.latitude, lng: flight.longitude },
         content: flight.company_name,
         id: flight.flight_id
-    });
+    }, newFlight);
 }
 
 //Removing unactive flights from map.

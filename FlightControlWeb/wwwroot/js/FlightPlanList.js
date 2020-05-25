@@ -33,7 +33,7 @@ function printFlightList(flightList) {
         newFlight.append(flightID);
         newFlight.append(airline);
         HTMLFlightList.append(newFlight);
-        addOrUpdateMarker(flight);
+        addOrUpdateMarker(flight, newFlight);
     }
 }
 
