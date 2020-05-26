@@ -16,6 +16,7 @@ function initMap() {
         resetFlightPlanView();
         removeExistingPaths();
         resetPlaneMarker();
+        removeHighlight();
     });
     
 }
@@ -53,12 +54,20 @@ function addMarker(props, newFlight) {
 }
 
 function printSegments(flightPlan) {
+    var lineSymbol = {
+        path: 'M 0,-1 0,1',
+        strokeOpacity: 1,
+        strokeColor: 'black',
+        scale: 2
+    };
     let flightPath = new google.maps.Polyline({
-        //path: flightPlanCoordinates,
         geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 2
+        icons: [{
+            icon: lineSymbol,
+            offset: '0',
+            repeat: '20px'
+        }],
+        strokeOpacity: 0,
     });
     let arr = [];
     let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };

@@ -13,9 +13,9 @@
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWQ5L6AElMwPpnkb4oESTNStWYP-5z00&callback=initMap">
     </script>
-    <div ondrop="drop(event)" ondragover="allowDrop(event)">
-        <ul id="flightList">
-        </ul>
+    <div id="flightList" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <ul id="internalFlighList"></ul>
+        <ul id="externalFlightList"></ul>
     </div>
 
     <div id="currentFlightPlan" style="display: none;">

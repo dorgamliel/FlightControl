@@ -1,6 +1,6 @@
 ﻿document.getElementById("demo").innerHTML = "working"
-let t = new Date().toISOString();
 updateFlightList();
+let currentlyHighlightedFlight = null;
 
 async function updateFlightList() {
     let t = new Date().toISOString();
@@ -16,10 +16,13 @@ async function updateFlightList() {
 
 
 function printFlightList(flightList) {
-    let HTMLFlightList = document.getElementById("flightList");
-    HTMLFlightList.innerHTML = '';
+    let internalFlighList = document.getElementById("internalFlighList");
+    let externalFlightList = document.getElementById('externalFlightList');
+    internalFlighList.innerHTML = '';
+    externalFlightList.innerHTML = '';
     for (flight of flightList) {
         let newFlight = document.createElement('li');
+        newFlight.id = flight.flight_id;
         newFlight.setAttribute('onclick', 'flightClicked(this)');
         let onlyFlightID = document.createElement('p');
         onlyFlightID.style.display = 'none';
@@ -29,10 +32,22 @@ function printFlightList(flightList) {
         onlyFlightID.innerHTML = JSON.stringify(flight.flight_id);
         flightID.innerHTML = 'Flight ID: ' + JSON.stringify(flight.flight_id);
         airline.innerHTML = 'Airline: ' + JSON.stringify(flight.company_name);
+        if (currentlyHighlightedFlight != null) {
+            if (flight.flight_id == currentlyHighlightedFlight.flight_id) {
+                newFlight.style.border = 'solid';
+            }
+        }
         newFlight.append(onlyFlightID);
         newFlight.append(flightID);
         newFlight.append(airline);
-        HTMLFlightList.append(newFlight);
+        if (flight.is_external) {
+            externalFlightList.append(newFlight);
+        } else {
+            internalFlighList.append(newFlight);
+            let deleteButton = document.createElement('button');
+            deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
+            newFlight.appendChild(deleteButton);
+        }
         addOrUpdateMarker(flight, newFlight);
     }
 }
@@ -48,6 +63,7 @@ async function flightClicked(flight) {
     removeExistingPaths();
     printSegments(flightPlan);
     changeFlightMarker(flightPlan);
+    highlightFlight(flightPlan);
 }
 
 async function displayCurrentFlightPlan(flightPlan) {
@@ -79,25 +95,6 @@ function resetFlightPlanView() {
     currentFlightPlan.style.display = 'none';
 }
 
-function createFlightPath(flightPlan) {
-    var flightPath = new google.maps.Polyline({
-        //path: flightPlanCoordinates,
-        geodesic: true,
-        strokeColor: '#FF0000',
-        strokeOpacity: 1.0,
-        strokeWeight: 1
-    });
-    let arr = [];
-    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
-    arr.push(coupl);
-    for (let i = 0; i < flightPlan.segments.length; i++) {
-        let segPoint = flightPlan.segments[i];
-        let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude};
-        arr.push(couple);
-    }
-    flightPath.setPath(arr);
-    return flightPath;
-}
 
 
 function getArrivalTime(segments) {
@@ -130,12 +127,42 @@ async function postFlightFromFile(fileData) {
     var xhttp = new XMLHttpRequest();
     await xhttp.open("POST", "api/FlightPlan", true);
     xhttp.setRequestHeader("Content-Type", "application/json")
-    var str = 'hi';
-    let car = (JSON.stringify(fileData));
     await xhttp.send(fileData);
 }
 
 function removeErrorMsg (button) {
     button.pare
+}
+
+
+function highlightFlight(flightPlan) {
+    let FlightElement = document.getElementById(flightPlan.flight_id);
+    FlightElement.style.border = 'solid'
+    if (currentlyHighlightedFlight != null) {
+        FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
+        FlightElement.style.border = 'none';
+    }
+    currentlyHighlightedFlight = flightPlan;
+}
+
+
+function removeHighlight() {
+    if (currentlyHighlightedFlight == null) {
+        return;
+    }
+    let FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
+    FlightElement.style.border = 'none';
+    currentlyHighlightedFlight = null;
+}
+
+
+async function deleteFlight(deleteButton, event) {
+    event.stopPropagation();
+    let flightElement = deleteButton.parentElement;
+    let flightID = flightElement.id;
+    var xhttp = new XMLHttpRequest();
+    await xhttp.open("DELETE", "api/Flights/" + flightID, true);
+    xhttp.setRequestHeader("Content-Type", "application/json")
+    await xhttp.send();
 }
 
