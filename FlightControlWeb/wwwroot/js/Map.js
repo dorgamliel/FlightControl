@@ -1,4 +1,8 @@
-﻿function initMap() {
+﻿let polylines = [];
+
+
+
+function initMap() {
     //Map properties.
     let properties = {
         zoom: 13,
@@ -8,64 +12,85 @@
     window.map = new google.maps.Map(document.getElementById('map'), properties);
     //Array of markers.
     window.markers = [];
+    window.map.addListener('click', function() {
+        resetFlightPlanView();
+        removeExistingPaths();
+        resetPlaneMarker();
+    });
     
 }
 
 //Add Marker function.
 function addMarker(props, newFlight) {
+    var planeMarker = {
+        url: 'resources/plane.png',
+        anchor: new google.maps.Point(20, 20),
+        scaledSize: new google.maps.Size(40, 40),
+    }
     let marker = new google.maps.Marker({
         id: props.id,
         position: props.coords,
         content: props.content,
-        map: window.map
+        map: window.map,
     });
+    marker.setIcon(planeMarker)
     //Adding a marker to list of map markers.
     window.markers.push(marker);
-    let clicked = false;
-    let infoWindow;
-    var flightPath = new google.maps.Polyline({
+    var infoWindow = new google.maps.InfoWindow({
+        content: props.id
+    });
+    //flightPath.setPath(flightPlanCoordinates);
+    marker.addListener('click', function () {
+        flightClicked(newFlight);
+    });
+    marker.addListener('mouseover', function () {
+        infoWindow.open(window.map, marker)
+    })
+    marker.addListener('mouseout', function () {
+        infoWindow.close();
+    })
+
+}
+
+function printSegments(flightPlan) {
+    let flightPath = new google.maps.Polyline({
         //path: flightPlanCoordinates,
         geodesic: true,
         strokeColor: '#FF0000',
         strokeOpacity: 1.0,
         strokeWeight: 2
     });
-    //flightPath.setPath(flightPlanCoordinates);
-    marker.addListener('click', function () {
-            //Buttons first click.
-            if (clicked == false) {
-                clicked = true;
-                infoWindow.open(map, marker);
-                displayCurrentFlightPlan(newFlight, flightPath);
-                marker.setIcon('https://www.google.com/mapfiles/marker_green.png');
-                
-                //flightPath.setMap(map);
-                //Button second click ("disable").
-            } else {
-                clicked = false;
-                infoWindow.close(map, marker);
-                //displayCurrentFlightPlan(newFlight);
-                marker.setIcon('https://www.google.com/mapfiles/marker_yellow.png');
-                printSegments(null, flightPath);
-
-            }
-    });
-
-    //Adds content if exists.
-    if (props.content) {
-        infoWindow = new google.maps.InfoWindow({
-            content: props.content
-        });
+    let arr = [];
+    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
+    arr.push(coupl);
+    for (let i = 0; i < flightPlan.segments.length; i++) {
+        let segPoint = flightPlan.segments[i];
+        let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude };
+        arr.push(couple);
     }
-
+    flightPath.setPath(arr);
+    polylines.push(flightPath);
+    flightPath.setMap(window.map);
 }
 
-function printSegments(flightPlan, flightPath) {
-    
-    if (flightPlan == null) {
-        flightPath.setMap(null);
-    } else {
-        flightPath.setMap(window.map);
+
+function changeFlightMarker(flightPlan) {
+    var planeMarker = {
+        url: 'resources/plane.png',
+        anchor: new google.maps.Point(20, 20),
+        scaledSize: new google.maps.Size(40, 40),
+    }
+    var clickedPlaneMarker = {
+        url: 'resources/plane-yellow.png',
+        anchor: new google.maps.Point(30, 30),
+        scaledSize: new google.maps.Size(60, 60),
+    }
+    for (marker of window.markers) {
+        if (marker.id == flightPlan.flight_id) {
+            marker.setIcon(clickedPlaneMarker);
+        } else {
+            marker.setIcon(planeMarker);
+        }
     }
 }
 
@@ -79,7 +104,7 @@ function addOrUpdateMarker(flight, newFlight) {
     }
     addMarker({
         coords: { lat: flight.latitude, lng: flight.longitude },
-        content: flight.company_name,
+        //content: flight.company_name,
         id: flight.flight_id
     }, newFlight);
 }
@@ -97,6 +122,20 @@ function removeUnactiveFlights(flightList) {
     }
 }
 
-function f1() {
-    let x = 0;
+function removeExistingPaths() {
+    for (polyline of polylines) {
+        polyline.setMap(null);
+    }
+    polylines = [];
+}
+
+function resetPlaneMarker() {
+    var planeMarker = {
+        url: 'resources/plane.png',
+        anchor: new google.maps.Point(20, 20),
+        scaledSize: new google.maps.Size(40, 40),
+    }
+    for (marker of window.markers) {
+        marker.setIcon(planeMarker);
+    }
 }
