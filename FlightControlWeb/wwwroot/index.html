@@ -1,130 +1,73 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿
+<!DOCTYPE html>
+<html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/MyStyle.css">
-    <title>hello world!</title>
 </head>
 <body ondrop="drop(event)" ondragover="allowDrop(event)">
-    <h1 id="demo"></h1>
-    <h1 class="display-4" style="margin-left: 10px;">FLIGHT CONTROL</h1>
-    <div class="row">
-        <!--Google Maps API-->
-        <div id="map"></div>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWQ5L6AElMwPpnkb4oESTNStWYP-5z00&callback=initMap">
-        </script>
-        <!--Active flights list.-->
-        <div style="float: right; margin-left: 0.5%;width:15%;">
-            <div class="list-group" style="height: 600px;">
-                <div style="font-size: large;font-weight: bold;font-style: oblique;border-bottom: 6px solid lightslategray;">Active Flights</div>
-                <div class="list-group-item list-group-item-dark dark">
-                    <div style="float: left;padding-left: 10px;">Flight ID</div>
-                    <div style="float: right;padding-right: 30px;">Airline</div>
-                </div>
-                <div class="square" style="height:300px;background-color:white;border:1px solid lightgrey;overflow-y: scroll;">
-                    <button ondrop="drop(event)" ondragover="allowDrop(event)"  type="button" class="list-group-item list-group-item-action" style="border: none;padding-bottom: 5px;padding-top: 5px;">
-                        <div class="row">
-                            <div class="col-sm">
-                                <span class="close" style="cursor: pointer;position: absolute;transform: translate(-100%, 0%);font-size: 20px;">&times;</span>
-                                <div id="flightList" style="float: left;padding-left: 10px;"></div>
-                            </div>
-                            <div class="col-sm">
-                                <div id="airline" style="float: right;"></div>
-                            </div>
-                        </div>
-                    </button>
-
-                </div>
-                <div class="square" style="height:300px;background-color:white;border:1px solid lightgrey;overflow-y: scroll;">
-                    <button type="button" class="list-group-item list-group-item-action" style="border: none;padding-bottom: 5px;padding-top: 5px;">
-                        <div style="float: left;">AX8394</div>
-                        <div style="float: right;">SWISS AIR</div>
-                    </button>
-                    <button type="button" class="list-group-item list-group-item-action" style="border: none;padding-bottom: 5px;padding-top: 5px;">
-                        <div style="float: left;">AX8394</div>
-                        <div style="float: right;">SWISS AIR</div>
-                    </button>
-                </div>
-            </div>
-        </div>
+    <div id="errorMsg" style="display: none">
+        <button onclick="removeErrorMsg(this.parentElement)"></button>
     </div>
-    <div>
-        <!--Selected flight plan.-->
-        <div class="card" style="border-style:outset;box-shadow: 5px 5px 10px grey;margin-top:2px; margin-bottom:10px;margin-left:2%;width:80%;height:120px;background-color:white">
-            <div class="row" style="text-align: center;">
-
-                <div class="col-sm">
-                    <h5 class="card-title">Flight ID</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Airline</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Passengers</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Origin</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Destination</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Departure Time</h5>
-                </div>
-                <div class="col-sm">
-                    <h5 class="card-title">Arrival Time</h5>
-                </div>
-            </div>
-            <div id="CurrentFlightPlan" class="row" style="text-align: center;">
-                <div id="flightDetails" class="col-sm">
-                    <p id="flightID" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                </div>
-                <div id="flightDetails" class="col-sm">
-                    <p id="airline" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                </div>
-                <div id="flightDetails" class="col-sm">
-                    <p id="passengers" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                </div>
-                <div id="flightPath" class="col-sm">
-                    <div id="origin">
-                        <p id="originLatitude" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                        <p id="originLongitude" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                    </div>
-                </div>
-                <div id="flightPath" class="col-sm">
-                    <div id="destination">
-                        <p id="destLatitude" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                        <p id="destLongitude" class="card-title" style="color:crimson;font-size: 20px; font-weight:500;"></p>
-                    </div>
-                </div>
-                <div id="flightTime" class="col-sm">
-                    <p id="departureTime" class="card-title" style="color:crimson;font-size: 15px; font-weight:500;font-weight: bold;"></p>
-
-                </div>
-                <div id="flightTime" class="col-sm">
-                    <p id="arrivalTime" class="card-title" style="color:crimson;font-size: 15px; font-weight:500;font-weight: bold;"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        var closebtns = document.getElementsByClassName("close");
-        var i;
-
-        for (i = 0; i < closebtns.length; i++) {
-            closebtns[i].addEventListener("click", function () {
-                this.parentElement.parentElement.parentElement.style.display = 'none';
-            });
-        }
+    <h1 id="demo">Hello World!</h1>
+    <!--map element-->
+    <div id="map" style="width:100%;height:400px;"></div>
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWQ5L6AElMwPpnkb4oESTNStWYP-5z00&callback=initMap">
     </script>
-    <div id="errorMsg" style="display: none"></div>
+    <!--end of map element-->
+
+
+    <!--flight list element-->
+    <div id="flightList" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <!--internal flight list element-->
+        <div id="internalFlighList"></div>
+        <!--external flight list element-->
+        <div id="externalFlightList"></div>
+    </div>
+    <!--end of flight list element-->
+
+
+    <!--current flight plan element-->
+    <div id="currentFlightPlan" style="display: none;">
+        <div>
+            <!--simple flight details-->
+            <div id="flightDetails">
+                <div id="flightID"></div>
+                <div id="airline"></div>
+                <div id="passengers"></div>
+            </div>
+        </div>
+        <div>
+            <!--origin and destination elements-->
+            <div id="flightPath">
+                <div id="origin">
+                    <div>
+                        Origin:
+                        <div id="originLongitude"></div>
+                        <div id="originLatitude"></div>
+                    </div>
+                </div>
+                <div id="destination">
+                    <div>
+                        Destination:
+                        <div id="destLongitude"></div>
+                        <div id="destLatitude"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--flight times-->
+        <div id="flightTime">
+            <div>
+                <div id="departureTime"></div>
+                <div id="arrivalTime"></div>
+            </div>
+        </div>
+    </div>
+    <!--end of current flight plan element-->
+
+
     <script src="js/Map.js"></script>
     <script src="/js/FlightPlanList.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 </body>
 </html>

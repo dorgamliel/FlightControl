@@ -21,7 +21,7 @@ function printFlightList(flightList) {
     internalFlighList.innerHTML = '';
     externalFlightList.innerHTML = '';
     for (flight of flightList) {
-        let newFlight = document.createElement('li');
+        let newFlight = document.createElement('div');
         newFlight.id = flight.flight_id;
         newFlight.setAttribute('onclick', 'flightClicked(this)');
         let onlyFlightID = document.createElement('p');
@@ -41,9 +41,9 @@ function printFlightList(flightList) {
         newFlight.append(flightID);
         newFlight.append(airline);
         if (flight.is_external) {
-            externalFlightList.append(newFlight);
+            externalFlightList.appendChild(newFlight);
         } else {
-            internalFlighList.append(newFlight);
+            internalFlighList.appendChild(newFlight);
             let deleteButton = document.createElement('button');
             deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
             newFlight.appendChild(deleteButton);
