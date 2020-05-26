@@ -1,4 +1,4 @@
-﻿document.getElementById("demo").innerHTML
+﻿document.getElementById("demo").innerHTML = "working"
 let t = new Date().toISOString();
 updateFlightList();
 
@@ -20,65 +20,37 @@ function printFlightList(flightList) {
     HTMLFlightList.innerHTML = '';
     for (flight of flightList) {
         let newFlight = document.createElement('li');
-        newFlight.setAttribute('onclick', 'displayCurrentFlightPlan(this)');
+        newFlight.setAttribute('onclick', 'flightClicked(this)');
         let onlyFlightID = document.createElement('p');
         onlyFlightID.style.display = 'none';
         onlyFlightID.id = 'onlyFlightID';
         let flightID = document.createElement('p');
         let airline = document.createElement('p');
-        onlyFlightID.innerHTML = JSON.stringify(flight.flight_id)
-        flightID.innerHTML = JSON.stringify(flight.flight_id);
+        onlyFlightID.innerHTML = JSON.stringify(flight.flight_id);
+        flightID.innerHTML = 'Flight ID: ' + JSON.stringify(flight.flight_id);
         airline.innerHTML = 'Airline: ' + JSON.stringify(flight.company_name);
         newFlight.append(onlyFlightID);
         newFlight.append(flightID);
-        //newFlight.append(airline);
+        newFlight.append(airline);
         HTMLFlightList.append(newFlight);
         addOrUpdateMarker(flight, newFlight);
     }
 }
-async function getSeg(flight) {
-    let flightID = JSON.parse(flight.children[0].innerHTML);
-    let request = new Request('/api/FlightPlan/' + flightID);
-    let response = await fetch(request);
-    response = await response.json();
-    return JSON.parse(JSON.stringify(response));
-}
 
-async function displayCurrentFlightPlan(flight, flightPath) {
+
+async function flightClicked(flight) {
     let flightID = JSON.parse(flight.children[0].innerHTML);
-    let request = new Request('/api/FlightPlan/' + flightID);
+    let request = await new Request('/api/FlightPlan/' + flightID);
     let response = await fetch(request);
     response = await response.json();
     let flightPlan = JSON.parse(JSON.stringify(response));
-    flightPath = createFlightPath(flightPlan, flightPath);
-    printSegments(flightPlan, flightPath);
-    try {
-        assignFlightPathView(flightPlan);
-        document.getElementById('errorMsg').style.display = 'initial';
-    }
-    catch (err) {
-        document.getElementById('currentFlightPlan').style.display = 'none';
-        let error = document.getElementById('errorMsg');
-        error.innerHTML = 'ERROR: could not find flight details.';
-        error.style.display = 'initial';
-    }
-    return flightPath;
+    displayCurrentFlightPlan(flightPlan);
+    removeExistingPaths();
+    printSegments(flightPlan);
+    changeFlightMarker(flightPlan);
 }
 
-function createFlightPath(flightPlan, flightPath) {
-    let arr = [];
-    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
-    arr.push(coupl);
-    for (let i = 0; i < flightPlan.segments.length; i++) {
-        let segPoint = flightPlan.segments[i];
-        let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude};
-        arr.push(couple);
-    }
-    flightPath.setPath(arr);
-    return flightPath;
-}
-
-function assignFlightPathView(flightPlan) {
+async function displayCurrentFlightPlan(flightPlan) {
     let airline = flightPlan.company_name;
     let passengers = flightPlan.passengers;
     let origin = flightPlan.initial_location;
@@ -89,16 +61,42 @@ function assignFlightPathView(flightPlan) {
     let flightTime = getArrivalTime(flightPlan.segments);
     let arrivalTimeMs = depTime.getTime() + (flightTime * 1000);
     let arrivalTime = new Date(arrivalTimeMs);
-    document.getElementById("flightID").innerHTML = flightID;
-    document.getElementById("airline").innerHTML = airline;
-    document.getElementById("passengers").innerHTML = passengers;
-    document.getElementById("originLongitude").innerHTML = origin.longitude;
-    document.getElementById("originLatitude").innerHTML = origin.latitude;
-    document.getElementById("destLongitude").innerHTML = destination.longitude;
-    document.getElementById("destLatitude").innerHTML = destination.latitude;
-    document.getElementById("departureTime").innerHTML = depTime.toUTCString();
-    document.getElementById("arrivalTime").innerHTML = arrivalTime.toUTCString();
+    document.getElementById("flightID").innerHTML = 'Flight: ' + flightID;
+    document.getElementById("airline").innerHTML = 'Airline: ' + airline;
+    document.getElementById("passengers").innerHTML = 'passengers: ' + passengers;
+    document.getElementById("originLongitude").innerHTML = 'Longitude: ' + origin.longitude;
+    document.getElementById("originLatitude").innerHTML = 'Latitude: ' + origin.latitude;
+    document.getElementById("destLongitude").innerHTML = 'Longitude: ' + destination.longitude;
+    document.getElementById("destLatitude").innerHTML = 'Latitude: ' + destination.latitude;
+    document.getElementById("departureTime").innerHTML = "DEPARTURE TIME: " + depTime.toUTCString();
+    document.getElementById("arrivalTime").innerHTML = "ARRIVAL TIME: " + arrivalTime.toUTCString();
     currentFlightPlan.style.display = 'initial'
+}
+
+
+function resetFlightPlanView() {
+    let currentFlightPlan = document.getElementById('currentFlightPlan');
+    currentFlightPlan.style.display = 'none';
+}
+
+function createFlightPath(flightPlan) {
+    var flightPath = new google.maps.Polyline({
+        //path: flightPlanCoordinates,
+        geodesic: true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 1
+    });
+    let arr = [];
+    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
+    arr.push(coupl);
+    for (let i = 0; i < flightPlan.segments.length; i++) {
+        let segPoint = flightPlan.segments[i];
+        let couple = { "lat": segPoint.latitude, "lng": segPoint.longitude};
+        arr.push(couple);
+    }
+    flightPath.setPath(arr);
+    return flightPath;
 }
 
 
@@ -135,5 +133,9 @@ async function postFlightFromFile(fileData) {
     var str = 'hi';
     let car = (JSON.stringify(fileData));
     await xhttp.send(fileData);
+}
+
+function removeErrorMsg (button) {
+    button.pare
 }
 
