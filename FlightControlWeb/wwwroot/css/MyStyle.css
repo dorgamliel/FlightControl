@@ -7,10 +7,15 @@
 }
 
 #map {
-    height: 400px;
-    width: 1000px;
+   height: 600px;
+    width: 80%;
+    margin-left:2%;
 }
 
 #CurrentFlightPlan {
 
+}
+
+.selector-for-some-widget {
+    box-sizing: content-box;
 }
