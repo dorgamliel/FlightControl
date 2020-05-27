@@ -25,19 +25,13 @@ namespace FlightControlWeb.Controllers
             _context = context;
         }
 
-        ///delete this.
-        // GET: api/FlightPlan
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FlightPlan>>> GetFlightPlan()
-        {
-            return await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).ToListAsync();
-        }
-
         // GET: api/FlightPlan/5
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
-            var flightPlan = await _context.FlightPlan.Include(x => x.Segments).Include(x => x.InitialLocation).Where(x => String.Equals(id, x.FlightID)).FirstOrDefaultAsync();
+            var x =  _context.FlightPlan.Include(x => x.Segments);
+            var flightPlan = await x.Include(x =>
+            x.InitialLocation).Where(x => String.Equals(id, x.FlightID)).FirstOrDefaultAsync();
             if (flightPlan != null)
             {
                 return flightPlan;
@@ -110,14 +104,14 @@ namespace FlightControlWeb.Controllers
                 jsonText = sr.ReadToEnd();
                 sr.Close();
             }
-            var dezerializerSettings = new JsonSerializerSettings
+            var deserialSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
                     NamingStrategy = new SnakeCaseNamingStrategy()
                 }
             };
-            var flightPlan = JsonConvert.DeserializeObject<FlightPlan>(jsonText, dezerializerSettings);
+            var flightPlan = JsonConvert.DeserializeObject<FlightPlan>(jsonText, deserialSettings);
             return flightPlan;
         }
     }

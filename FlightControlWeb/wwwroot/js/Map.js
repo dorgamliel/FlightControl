@@ -70,7 +70,10 @@ function printSegments(flightPlan) {
         strokeOpacity: 0,
     });
     let arr = [];
-    let coupl = { "lat": flightPlan.initial_location.latitude, "lng": flightPlan.initial_location.longitude };
+    let coupl = {
+        "lat": flightPlan.initial_location.latitude,
+        "lng": flightPlan.initial_location.longitude
+    };
     arr.push(coupl);
     for (let i = 0; i < flightPlan.segments.length; i++) {
         let segPoint = flightPlan.segments[i];
