@@ -27,8 +27,9 @@
     font-size: 20px;
     font-weight: 500;
 }
+
 #passengers {
-    color:crimson;
+    color: crimson;
     font-size: 20px;
     font-weight: 500;
 }
@@ -178,8 +179,9 @@
 
 #rightTitle {
     float: right;
-    padding-right: 3%;
+    padding-right: 10%;
 }
+
 
 #currentFlightPlan {
     border-style: outset;
@@ -239,6 +241,23 @@
         top: 0;
         opacity: 1
     }
+}
+
+
+.flightInList {
+    float: left;
+    padding-left: 13%;
+}
+
+.airlineInList {
+    float: right;
+    padding-right: 40%;
+    white-space: nowrap;
+    width: 1px;
+}
+
+.buttonInList {
+    
 }
 
 .display-4 {
