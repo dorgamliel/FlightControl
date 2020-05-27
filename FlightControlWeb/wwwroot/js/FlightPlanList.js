@@ -42,8 +42,6 @@ function printFlightList(flightList) {
             newFlight.style.border = 'solid';
         }
         newFlight.append(onlyFlightID);
-        newFlight.append(flightID);
-        newFlight.append(airline);
         if (flight.is_external) {
             externalFlightList.appendChild(newFlight);
         } else {
@@ -55,8 +53,11 @@ function printFlightList(flightList) {
             deleteButton.appendChild(deleteIcon);
             deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
             newFlight.appendChild(deleteButton);
+            deleteButton.style.float = 'left';
         }
         addOrUpdateMarker(flight, newFlight);
+        newFlight.append(flightID);
+        newFlight.append(airline);
     }
 }
 
