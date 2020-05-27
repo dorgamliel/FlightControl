@@ -27,13 +27,18 @@ function printFlightList(flightList) {
         let onlyFlightID = document.createElement('p');
         onlyFlightID.style.display = 'none';
         onlyFlightID.id = 'onlyFlightID';
-        let flightID = document.createElement('p');
-        let airline = document.createElement('p');
+        let flightID = document.createElement('div');
+        let airline = document.createElement('div');
         onlyFlightID.innerHTML = JSON.stringify(flight.flight_id);
         flightID.innerHTML = flight.flight_id;
         airline.innerHTML = flight.company_name;
+        flightID.className = 'flightInList'
+        airline.className = 'airlineInList'
+        flightID.style.float = 'left';
+        airline.style.float = 'right';
         if (currentlyHighlightedFlight != null) {
             if (flight.flight_id == currentlyHighlightedFlight.flight_id) {
+                //TODO: different and better style
                 newFlight.style.border = 'solid';
             }
         }
@@ -45,6 +50,7 @@ function printFlightList(flightList) {
         } else {
             internalFlighList.appendChild(newFlight);
             let deleteButton = document.createElement('button');
+            deleteButton.className = 'buttonInList'
             deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
             newFlight.appendChild(deleteButton);
         }
