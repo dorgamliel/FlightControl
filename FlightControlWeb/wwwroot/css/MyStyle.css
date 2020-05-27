@@ -7,13 +7,14 @@
 }
 
 #map {
-
-    height: 600px;
-    width: 80%;
-    margin-left:2%;
+    height: 500px;
+    min-width:60%;
+    margin-left: 2%;
+    margin-right:-2%;
 }
 
-
+#mapAndList {
+}
 
 #flightID {
     color: crimson;
@@ -67,13 +68,59 @@
     font-weight: 500;
 }
 
+#flightIDHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#airlineHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#passengersHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#originLongitudeHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#originLatitudeHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#destLongitudeHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#destLatitudeHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
 #arrivalTime {
-    color:crimson;
+    color: crimson;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#departureTimeHeader {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+#arrivalTimeHeader {
     font-size: 20px;
     font-weight: 500;
 }
 
 #currentFlightPlan {
+    display:none;
     border-style: outset;
     box-shadow: 5px 5px 10px black;
     margin-top: 2px;
@@ -87,18 +134,17 @@
 
 #row {
     text-align: center;
-
 }
 
 #internalFlighList {
-    height: 300px;
+    height: 250px;
     background-color: white;
     border: 1px solid lightgrey;
     overflow-y: scroll;
 }
 
 #externalFlightList {
-    height: 300px;
+    height: 250px;
     background-color: white;
     border: 1px solid lightgrey;
     overflow-y: scroll;
@@ -106,9 +152,12 @@
 
 #flightList {
     float: right;
-    margin-left: 0.5%;
-    width: 15%;
-    height: 600px;
+    
+    margin-right: 1%;
+    min-width: 250px;
+    max-width: 250px;
+    height: 500px;
+    padding-left: 3%;
 }
 #property {
     font-size: 20px;
@@ -124,12 +173,12 @@
 
 #leftTitle {
     float: left;
-    padding-left: 10px;
+    padding-left: 1%;
 }
 
 #rightTitle {
     float: right;
-    padding-right: 30px;
+    padding-right: 3%;
 }
 
 #currentFlightPlan {
@@ -141,6 +190,9 @@
     width: 80%;
     height: 120px;
     background-color: white
+}
+#secondTitle {
+    min-width: 15%;
 }
 
 #errorMsg {
@@ -161,6 +213,8 @@
     animation-name: animatetop;
     animation-duration: 1s;
 }
+
+
 
 /* Add Animation */
 @-webkit-keyframes animatetop {

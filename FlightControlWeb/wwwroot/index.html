@@ -15,10 +15,10 @@
     <h1 class="display-4" style="margin-left: 10px;">FLIGHT CONTROL</h1>
     <div id="mapAndList" class="row">
         <!--map element-->
-        <div id="map"></div>
+        <div id="map" class="col-sm"></div>
         <!--end of map element-->
         <!--flight list element-->
-        <div id="flightList" class="list-group" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div id="flightList" class="list-group col-sm" ondrop="drop(event)" ondragover="allowDrop(event)">
             <div id="listTitle">Active Flights</div>
             <div id="secondTitle" class="list-group-item list-group-item-dark dark">
                 <div id="leftTitle">Flight ID</div>
@@ -32,47 +32,47 @@
         <!--end of flight list element-->
     </div>
     <!--current flight plan element-->
-    <div id="currentFlightPlan" class="card">
+    <div id="currentFlightPlan">
         <div id="values" class="row">
-            <div class="col-md">
+            <div class="col-sm">
                 <!--simple flight details-->
                 <div id="flightDetails" class="row">
-                    <div id="flightIDHeader" class="col-md">
+                    <div id="flightIDHeader" class="col-sm">
                         Flight ID
                         <div id="flightID"></div>
                     </div>
-                    <div id="airlineHeader" class="col-md">
+                    <div id="airlineHeader" class="col-sm">
                         Airline
                         <div id="airline"></div>
                     </div>
-                    <div id="passengersHeader" class="col-md">
+                    <div id="passengersHeader" class="col-sm">
                         Passengers
                         <div id="passengers"></div>
                     </div>
                 </div>
             </div>
-            <div class="col-md">
+            <div class="col-sm">
                 <!--origin and destination elements-->
                 <div id="flightPath" class="row">
-                    <div id="origin" class="col-md">
+                    <div id="origin" class="col-sm">
                         <div>
-                            <div id="originLongitudeHeader" class="col-md">
+                            <div id="originLongitudeHeader" class="col-sm">
                                 Lng
                                 <div id="originLongitude"></div>
                             </div>
-                            <div id="originLatitudeHeader" class="col-md">
+                            <div id="originLatitudeHeader" class="col-sm">
                                 Lat
                                 <div id="originLatitude"></div>
                             </div>
                         </div>
                     </div>
-                    <div id="destination" class="col-md">
+                    <div id="destination" class="col-sm">
                         <div>
-                            <div id="destLongitudeHeader" class="col-md">
+                            <div id="destLongitudeHeader" class="col-sm">
                                 Lng
                                 <div id="destLongitude"></div>
                             </div>
-                            <div id="destLatitudeHeader" class="col-md">
+                            <div id="destLatitudeHeader" class="col-sm">
                                 Lat
                                 <div id="destLatitude"></div>
                             </div>
@@ -81,13 +81,13 @@
                 </div>
             </div>
             <!--flight times-->
-            <div id="flightTime" class="col-md">
+            <div id="flightTime" class="col-sm">
                 <div class="row">
-                    <div id="departureTimeHeader" class="col-md">
+                    <div id="departureTimeHeader" class="col-sm">
                         Departure Time
                         <div id="departureTime"></div>
                     </div>
-                    <div id="arrivalTimeHeader" class="col-md">
+                    <div id="arrivalTimeHeader" class="col-sm">
                         Arrival Time
                         <div id="arrivalTime"></div>
                     </div>
