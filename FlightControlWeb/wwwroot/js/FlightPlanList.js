@@ -39,7 +39,9 @@ function printFlightList(flightList) {
         if (currentlyHighlightedFlight != null &&
             flight.flight_id == currentlyHighlightedFlight.flight_id) {
             //TODO: different and better style
-            newFlight.style.border = 'solid';
+            newFlight.style.border = '0.5px solid';
+            newFlight.style.fontWeight = 'bold'
+            newFlight.style.backgroundColor = '#87CEEB';
         }
         newFlight.append(onlyFlightID);
         newFlight.append(flightID);
@@ -145,10 +147,14 @@ function removeErrorMsg (button) {
 
 function highlightFlight(flightPlan) {
     let FlightElement = document.getElementById(flightPlan.flight_id);
-    FlightElement.style.border = 'solid'
+    FlightElement.style.border = '0.5px solid'
+    FlightElement.style.fontWeight = 'bold'
+    FlightElement.style.backgroundColor = '#87CEEB';
     if (currentlyHighlightedFlight != null) {
         FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
         FlightElement.style.border = 'none';
+        FlightElement.style.fontWeight = 'none'
+        FlightElement.style.backgroundColor = 'none';
     }
     currentlyHighlightedFlight = flightPlan;
 }
@@ -160,6 +166,8 @@ function removeHighlight() {
     }
     let FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
     FlightElement.style.border = 'none';
+    FlightElement.style.fontWeight = 'none'
+    FlightElement.style.backgroundColor = 'none';
     currentlyHighlightedFlight = null;
 }
 
