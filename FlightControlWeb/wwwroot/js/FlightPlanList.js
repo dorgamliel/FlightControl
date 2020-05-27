@@ -1,4 +1,4 @@
-﻿document.getElementById("demo").innerHTML = "working"
+﻿document.getElementById("demo").innerHTML
 updateFlightList();
 let currentlyHighlightedFlight = null;
 
@@ -77,15 +77,15 @@ async function displayCurrentFlightPlan(flightPlan) {
     let flightTime = getArrivalTime(flightPlan.segments);
     let arrivalTimeMs = depTime.getTime() + (flightTime * 1000);
     let arrivalTime = new Date(arrivalTimeMs);
-    document.getElementById("flightID").innerHTML = 'Flight: ' + flightID;
-    document.getElementById("airline").innerHTML = 'Airline: ' + airline;
-    document.getElementById("passengers").innerHTML = 'passengers: ' + passengers;
-    document.getElementById("originLongitude").innerHTML = 'Longitude: ' + origin.longitude;
-    document.getElementById("originLatitude").innerHTML = 'Latitude: ' + origin.latitude;
-    document.getElementById("destLongitude").innerHTML = 'Longitude: ' + destination.longitude;
-    document.getElementById("destLatitude").innerHTML = 'Latitude: ' + destination.latitude;
-    document.getElementById("departureTime").innerHTML = "DEPARTURE TIME: " + depTime.toUTCString();
-    document.getElementById("arrivalTime").innerHTML = "ARRIVAL TIME: " + arrivalTime.toUTCString();
+    document.getElementById("flightID").innerHTML = flightID;
+    document.getElementById("airline").innerHTML = airline;
+    document.getElementById("passengers").innerHTML = passengers;
+    document.getElementById("originLongitude").innerHTML = origin.longitude;
+    document.getElementById("originLatitude").innerHTML =origin.latitude;
+    document.getElementById("destLongitude").innerHTML = destination.longitude;
+    document.getElementById("destLatitude").innerHTML = destination.latitude;
+    document.getElementById("departureTime").innerHTML = depTime.toUTCString();
+    document.getElementById("arrivalTime").innerHTML = arrivalTime.toUTCString();
     currentFlightPlan.style.display = 'initial'
 }
 
