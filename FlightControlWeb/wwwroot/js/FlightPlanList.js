@@ -50,7 +50,10 @@ function printFlightList(flightList) {
         } else {
             internalFlighList.appendChild(newFlight);
             let deleteButton = document.createElement('button');
-            deleteButton.className = 'buttonInList'
+            deleteButton.className = 'btn btn-danger btn-sm rounded-0';
+            let deleteIcon = document.createElement('i');
+            deleteIcon.className = 'fa fa-trash';
+            deleteButton.appendChild(deleteIcon);
             deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
             newFlight.appendChild(deleteButton);
         }
