@@ -30,8 +30,8 @@ function printFlightList(flightList) {
         let flightID = document.createElement('p');
         let airline = document.createElement('p');
         onlyFlightID.innerHTML = JSON.stringify(flight.flight_id);
-        flightID.innerHTML = 'Flight ID: ' + JSON.stringify(flight.flight_id);
-        airline.innerHTML = 'Airline: ' + JSON.stringify(flight.company_name);
+        flightID.innerHTML = flight.flight_id;
+        airline.innerHTML = flight.company_name;
         if (currentlyHighlightedFlight != null) {
             if (flight.flight_id == currentlyHighlightedFlight.flight_id) {
                 newFlight.style.border = 'solid';
