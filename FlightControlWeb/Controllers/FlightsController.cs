@@ -216,7 +216,7 @@ namespace FlightControlWeb.Controllers
             //Get json string from external server.
             string jsonText = GetJsonFromServer(fullAdd);
             //Handling difference between class prop. names and json prop. names.
-            var dezerializerSettings = new JsonSerializerSettings
+            var deserialSettings = new JsonSerializerSettings
             {
                 ContractResolver = new DefaultContractResolver
                 {
@@ -226,7 +226,8 @@ namespace FlightControlWeb.Controllers
             List<Flight> extSrvFlights;
             try
             {
-                extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, dezerializerSettings);
+                extSrvFlights = JsonConvert.DeserializeObject<List<Flight>>(jsonText, 
+                    deserialSettings);
             } catch
             {
                 return allExtFlights;

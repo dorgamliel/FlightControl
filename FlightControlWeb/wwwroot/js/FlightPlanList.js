@@ -36,11 +36,10 @@ function printFlightList(flightList) {
         airline.className = 'airlineInList'
         flightID.style.float = 'left';
         airline.style.float = 'right';
-        if (currentlyHighlightedFlight != null) {
-            if (flight.flight_id == currentlyHighlightedFlight.flight_id) {
-                //TODO: different and better style
-                newFlight.style.border = 'solid';
-            }
+        if (currentlyHighlightedFlight != null &&
+            flight.flight_id == currentlyHighlightedFlight.flight_id) {
+            //TODO: different and better style
+            newFlight.style.border = 'solid';
         }
         newFlight.append(onlyFlightID);
         newFlight.append(flightID);
