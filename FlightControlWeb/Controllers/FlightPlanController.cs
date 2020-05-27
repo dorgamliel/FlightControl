@@ -29,9 +29,10 @@ namespace FlightControlWeb.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<FlightPlan>> GetFlightPlan(string id)
         {
-            var x =  _context.FlightPlan.Include(x => x.Segments);
-            var flightPlan = await x.Include(x =>
-            x.InitialLocation).Where(x => String.Equals(id, x.FlightID)).FirstOrDefaultAsync();
+            var a =  _context.FlightPlan.Include(x => x.Segments);
+            var b = a.Include(x => x.InitialLocation).Where(x => 
+            String.Equals(id, x.FlightID));
+            var flightPlan = await b.FirstOrDefaultAsync();
             if (flightPlan != null)
             {
                 return flightPlan;
