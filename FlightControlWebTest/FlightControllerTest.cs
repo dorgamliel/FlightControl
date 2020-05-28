@@ -82,3 +82,5 @@ namespace FlightControlWebTest
         }
     }
 }
+
+/// Based on: https://stackoverflow.com/questions/54219742/mocking-ef-core-dbcontext-and-dbset

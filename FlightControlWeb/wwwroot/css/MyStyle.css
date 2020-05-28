@@ -14,6 +14,7 @@
 }
 
 #mapAndList {
+    
 }
 
 #flightID {
@@ -197,8 +198,22 @@
 }
 
 #errorMsg {
-    display:none;
+    display: initial;
+    position: absolute;
+    background-color: #fefefe;
+    right: 37%;
+    border: 1px solid #888;
+    width: 25%;
+    border-radius:25px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 1s;
+    animation-play-state: running;
 }
+
+
 
 #errorContent {
     display: initial;
@@ -213,9 +228,13 @@
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 1s;
+    animation-play-state:running;
 }
 
-
+#errMsgBtn {
+    margin-right:2%;
+    margin-bottom:2%;
+}
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
@@ -242,6 +261,30 @@
     }
 }
 
+/* Add Animation */
+@-webkit-keyframes animateout {
+    to {
+        top: -300px;
+        opacity: 0
+    }
+
+    from {
+        top: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animateout {
+    to {
+        top: -300px;
+        opacity: 0
+    }
+
+    from {
+        top: 0;
+        opacity: 1
+    }
+}
 
 .flightInList {
     float: left;

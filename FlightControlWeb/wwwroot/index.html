@@ -10,7 +10,9 @@
 </head>
 <body ondrop="drop(event)" ondragover="allowDrop(event)">
     <div id="errorMsg">
-        <button onclick="removeErrorMsg(this.parentElement)"></button>
+        <button type="button" class="close" id="errMsgBtn" aria-label="Close" onclick="removeErrorMsg(this.parentElement)">
+            <span aria-hidden="true">&times;</span>
+        </button>
     </div>
     <h1 id="demo"></h1>
     <h1 class="display-4">FLIGHT CONTROL</h1>

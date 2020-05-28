@@ -150,8 +150,14 @@ async function postFlightFromFile(fileData) {
     await xhttp.send(fileData);
 }
 
-function removeErrorMsg (button) {
-    button.pare
+function removeErrorMsg(button) {
+    document.getElementById('errorMsg').style.display = 'none';
+    ///This is how you resume animation:
+    /*document.getElementById('errorMsg').style.animation = 'none';
+    setTimeout(function () {
+        document.getElementById('errorMsg').style.animation = '';
+    }, 10);*/
+    ///Plus, we need to change back display to whatever it should be, do all of that in a different fucntion.
 }
 
 
