@@ -50,6 +50,7 @@ function printFlightList(flightList) {
         newFlight.style.cursor = 'pointer';
         newFlight.append(onlyFlightID);
         if (flight.is_external) {
+            flightID.className = 'extflightInList';
             externalFlightList.appendChild(newFlight);
         } else {
             internalFlighList.appendChild(newFlight);

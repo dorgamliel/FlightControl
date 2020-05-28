@@ -248,6 +248,11 @@
     padding-left: 4%;
 }
 
+.extflightInList {
+    float: left;
+    padding-left: 20%;
+}
+
 .airlineInList {
     float: right;
     padding-right: 40%;
