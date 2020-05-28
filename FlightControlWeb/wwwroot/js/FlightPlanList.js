@@ -42,7 +42,12 @@ function printFlightList(flightList) {
             newFlight.style.border = '0.5px solid';
             newFlight.style.fontWeight = 'bold'
             newFlight.style.backgroundColor = '#87CEEB';
+            newFlight.style.height = '30px';
+        } else {
+            newFlight.style.height = '29px';
+            newFlight.style.borderBottom = '0.5px dashed #D0D0D0';
         }
+        newFlight.style.cursor = 'pointer';
         newFlight.append(onlyFlightID);
         if (flight.is_external) {
             externalFlightList.appendChild(newFlight);
@@ -55,7 +60,10 @@ function printFlightList(flightList) {
             deleteButton.appendChild(deleteIcon);
             deleteButton.setAttribute('onclick', 'deleteFlight(this, event)');
             newFlight.appendChild(deleteButton);
+            deleteButton.style.height = '28px';
+            deleteButton.style.width = '28px';
             deleteButton.style.float = 'left';
+            deleteButton.style.marginLeft = '0.4px';
         }
         addOrUpdateMarker(flight, newFlight);
         newFlight.append(flightID);
@@ -151,11 +159,13 @@ function highlightFlight(flightPlan) {
     FlightElement.style.border = '0.5px solid'
     FlightElement.style.fontWeight = 'bold'
     FlightElement.style.backgroundColor = '#87CEEB';
+    FlightElement.style.height = '30px';
     if (currentlyHighlightedFlight != null) {
         FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
+        FlightElement.style.backgroundColor = 'none';
         FlightElement.style.border = 'none';
         FlightElement.style.fontWeight = 'none'
-        FlightElement.style.backgroundColor = 'none';
+        FlightElement.style.height = 'none';
     }
     currentlyHighlightedFlight = flightPlan;
 }
@@ -166,9 +176,10 @@ function removeHighlight() {
         return;
     }
     let FlightElement = document.getElementById(currentlyHighlightedFlight.flight_id);
+    FlightElement.style.backgroundColor = 'none';
     FlightElement.style.border = 'none';
     FlightElement.style.fontWeight = 'none'
-    FlightElement.style.backgroundColor = 'none';
+    FlightElement.style.height = 'none';
     currentlyHighlightedFlight = null;
 }
 
