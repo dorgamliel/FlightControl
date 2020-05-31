@@ -1,5 +1,6 @@
 .vs
 .git
+out
 FlightControlWeb/obj
 FlightControlWeb/bin
 FlightControlWebTest/obj
