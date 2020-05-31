@@ -203,7 +203,9 @@
     background-color: #fefefe;
     right: 37%;
     border: 1px solid #888;
-    width: 25%;
+    width: auto;
+    padding-left:0.5%;
+    padding-right:1.5%;
     border-radius:25px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
@@ -213,27 +215,15 @@
     animation-play-state: running;
 }
 
-
-
-#errorContent {
-    display: initial;
-    float:right;
-    position: relative;
-    background-color: #fefefe;
-    margin-right:40%;
-    border: 1px solid #888;
-    width: 400px;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 1s;
-    animation-play-state:running;
+#xBtn {
+    margin-left:15%;
 }
+
 
 #errMsgBtn {
     margin-right:2%;
     margin-bottom:2%;
+    position:absolute;
 }
 
 /* Add Animation */
