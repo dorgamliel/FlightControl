@@ -144,10 +144,16 @@ function drop(event) {
 }
 
 async function postFlightFromFile(fileData) {
-    var xhttp = new XMLHttpRequest();
-    await xhttp.open("POST", "api/FlightPlan", true);
-    xhttp.setRequestHeader("Content-Type", "application/json")
-    await xhttp.send(fileData);
+    try {
+        var xhttp = new XMLHttpRequest();
+        await xhttp.open("POST", "api/FlightPlan", true);
+        xhttp.setRequestHeader("Content-Type", "application/json")
+        let response = await xhttp.send(fileData);
+        response = 5
+    } catch {
+        let errormsg = document.getElementById('errorMsg');
+        errormsg.innerHTML = 'error loading new flight';
+    }
 }
 
 function removeErrorMsg(button) {

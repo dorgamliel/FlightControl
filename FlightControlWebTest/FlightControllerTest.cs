@@ -38,6 +38,7 @@ namespace FlightControlWebTest
             InitialLocation init4 = new InitialLocation();
             FlightPlan fp1 = new FlightPlan()
             {
+                FlightID = "AX100",
                 CompanyName = "OneLine",
                 InitialLocation = init1,
                 Passengers = 123,
@@ -75,9 +76,10 @@ namespace FlightControlWebTest
             //Assert
             using (var context = new FlightDbContext(options))
             {
-                var controller = new FlightsController(context);
-                var flights = controller.GetFlight(new System.DateTime(2020, 01, 01));
-                Assert.Equals(1, flights.Result.Value.Count);
+                var controller = new FlightPlanController(context);
+                var flights = controller.GetFlightPlan("AX100");
+                var returnedID = (flights.Result.Value as FlightPlan).FlightID;
+                Assert.AreEqual(fp1.FlightID, (flights.Result.Value as FlightPlan).FlightID);
             }
         }
     }
