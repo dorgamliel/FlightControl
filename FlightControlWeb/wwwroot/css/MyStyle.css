@@ -198,7 +198,7 @@
 }
 
 #errorMsg {
-    display: initial;
+    display: none;
     position: absolute;
     background-color: #fefefe;
     right: 37%;

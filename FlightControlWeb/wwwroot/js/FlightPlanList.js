@@ -3,15 +3,22 @@ updateFlightList();
 let currentlyHighlightedFlight = null;
 
 async function updateFlightList() {
-    let t = new Date().toISOString();
-    let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
-    let flightList
-    let response = await fetch(request)
-    response = await response.json();
-    flightList = JSON.parse(JSON.stringify(response));
-    printFlightList(flightList);
-    removeUnactiveFlights(flightList);
-    setTimeout(updateFlightList, 3000);
+    try {
+        let t = new Date().toISOString();
+        let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
+        let flightList
+        let response = await fetch(request)
+        response = await response.json();
+        flightList = JSON.parse(JSON.stringify(response));
+        printFlightList(flightList);
+        removeUnactiveFlights(flightList);
+        setTimeout(updateFlightList, 3000);
+    }
+    catch {
+        let errormsg = document.getElementById('errorTxt');
+        errormsg.innerHTML = 'error updating flight list';
+        errormsg.parentElement.style.display = 'initial';
+    }
 }
 
 
@@ -87,32 +94,46 @@ async function flightClicked(flight) {
 }
 
 async function displayCurrentFlightPlan(flightPlan) {
-    let airline = flightPlan.company_name;
-    let passengers = flightPlan.passengers;
-    let origin = flightPlan.initial_location;
-    let destination = flightPlan.segments[flightPlan.segments.length - 1];
-    let currentFlightPlan = document.getElementById('currentFlightPlan');
-    let flightID = flightPlan.flight_id;
-    let depTime = new Date(origin.date_time);
-    let flightTime = getArrivalTime(flightPlan.segments);
-    let arrivalTimeMs = depTime.getTime() + (flightTime * 1000);
-    let arrivalTime = new Date(arrivalTimeMs);
-    document.getElementById("flightID").innerHTML = flightID;
-    document.getElementById("airline").innerHTML = airline;
-    document.getElementById("passengers").innerHTML = passengers;
-    document.getElementById("originLongitude").innerHTML = origin.longitude;
-    document.getElementById("originLatitude").innerHTML =origin.latitude;
-    document.getElementById("destLongitude").innerHTML = destination.longitude;
-    document.getElementById("destLatitude").innerHTML = destination.latitude;
-    document.getElementById("departureTime").innerHTML = depTime.toUTCString();
-    document.getElementById("arrivalTime").innerHTML = arrivalTime.toUTCString();
-    currentFlightPlan.style.display = 'initial'
+    try {
+        let airline = flightPlan.company_name;
+        let passengers = flightPlan.passengers;
+        let origin = flightPlan.initial_location;
+        let destination = flightPlan.segments[flightPlan.segments.length - 1];
+        let currentFlightPlan = document.getElementById('currentFlightPlan');
+        let flightID = flightPlan.flight_id;
+        let depTime = new Date(origin.date_time);
+        let flightTime = getArrivalTime(flightPlan.segments);
+        let arrivalTimeMs = depTime.getTime() + (flightTime * 1000);
+        let arrivalTime = new Date(arrivalTimeMs);
+        document.getElementById("flightID").innerHTML = flightID;
+        document.getElementById("airline").innerHTML = airline;
+        document.getElementById("passengers").innerHTML = passengers;
+        document.getElementById("originLongitude").innerHTML = origin.longitude;
+        document.getElementById("originLatitude").innerHTML = origin.latitude;
+        document.getElementById("destLongitude").innerHTML = destination.longitude;
+        document.getElementById("destLatitude").innerHTML = destination.latitude;
+        document.getElementById("departureTime").innerHTML = depTime.toUTCString();
+        document.getElementById("arrivalTime").innerHTML = arrivalTime.toUTCString();
+        currentFlightPlan.style.display = 'initial'
+    }
+    catch {
+        let errormsg = document.getElementById('errorTxt');
+        errormsg.innerHTML = 'error displaying flight details';
+        errormsg.parentElement.style.display = 'initial';
+    }
 }
 
 
 function resetFlightPlanView() {
-    let currentFlightPlan = document.getElementById('currentFlightPlan');
-    currentFlightPlan.style.display = 'none';
+    try {
+        let currentFlightPlan = document.getElementById('currentFlightPlan');
+        currentFlightPlan.style.display = 'none';
+    }
+    catch {
+        let errormsg = document.getElementById('errorTxt');
+        errormsg.innerHTML = 'error reseting flight plan view';
+        errormsg.parentElement.style.display = 'initial';
+    }
 }
 
 
@@ -131,26 +152,41 @@ function allowDrop(event) {
 }
 
 function drop(event) {
-    event.preventDefault();
-    let files = event.dataTransfer.files;
-    let reader = new FileReader();
-    reader.onload = function () {
-        postFlightFromFile(reader.result);
+    try {
+        event.preventDefault();
+        let files = event.dataTransfer.files;
+        let reader = new FileReader();
+        reader.onload = function () {
+            postFlightFromFile(reader.result);
+        }
+        for (file of files) {
+            reader.readAsText(file);
+            var x = 0;
+        }
     }
-    for (file of files) {
-        reader.readAsText(file);
-        var x = 0;
+    catch {
+        let errormsg = document.getElementById('errorTxt');
+        errormsg.innerHTML = 'error loading new flight';
+        errormsg.parentElement.style.display = 'initial';
     }
 }
 
 async function postFlightFromFile(fileData) {
     try {
-        var xhttp = new XMLHttpRequest();
+        let xhttp = new XMLHttpRequest();
         await xhttp.open("POST", "api/FlightPlan", true);
         xhttp.setRequestHeader("Content-Type", "application/json")
-        let response = await xhttp.send(fileData);
-        response = 5
-    } catch {
+        xhttp.onload = () => {
+            if (xhttp.status != 201) {
+                let errormsg = document.getElementById('errorTxt');
+                errormsg.innerHTML = 'error loading new flight';
+                errormsg.parentElement.style.display = 'initial';
+            }
+        }
+        await xhttp.send(fileData);
+        
+    }
+    catch(err) {
         let errormsg = document.getElementById('errorMsg');
         errormsg.innerHTML = 'error loading new flight';
     }
@@ -198,12 +234,19 @@ function removeHighlight() {
 
 
 async function deleteFlight(deleteButton, event) {
-    event.stopPropagation();
-    let flightElement = deleteButton.parentElement;
-    let flightID = flightElement.id;
-    var xhttp = new XMLHttpRequest();
-    await xhttp.open("DELETE", "api/Flights/" + flightID, true);
-    xhttp.setRequestHeader("Content-Type", "application/json")
-    await xhttp.send();
+    try {
+        event.stopPropagation();
+        let flightElement = deleteButton.parentElement;
+        let flightID = flightElement.id;
+        var xhttp = new XMLHttpRequest();
+        await xhttp.open("DELETE", "api/Flights/" + flightID, true);
+        xhttp.setRequestHeader("Content-Type", "application/json")
+        await xhttp.send();
+    }
+    catch {
+        let errormsg = document.getElementById('errorTxt');
+        errormsg.innerHTML = 'error deleting flight from server';
+        errormsg.parentElement.style.display = 'initial';
+    }
 }
 
