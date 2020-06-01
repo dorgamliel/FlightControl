@@ -2,15 +2,19 @@
 updateFlightList();
 let currentlyHighlightedFlight = null;
 
+
+// update flight list every 3 seconds
 async function updateFlightList() {
     try {
         let t = new Date().toISOString();
+        // get list of all active flights
         let request = new Request('/api/Flights?relative_to=' + t + '&sync_all');
         let flightList
         let response = await fetch(request)
         response = await response.json();
         flightList = JSON.parse(JSON.stringify(response));
         printFlightList(flightList);
+        // remove markers of unactive flights from map
         removeUnactiveFlights(flightList);
         setTimeout(updateFlightList, 3000);
     }
@@ -21,7 +25,7 @@ async function updateFlightList() {
     }
 }
 
-
+// insert all the flights from 'flightList' to appropriate displayed list
 function printFlightList(flightList) {
     let internalFlighList = document.getElementById("internalFlighList");
     let externalFlightList = document.getElementById('externalFlightList');
@@ -80,19 +84,27 @@ function printFlightList(flightList) {
 }
 
 
+// event of a flight clicked from list or from marker
 async function flightClicked(flight) {
     let flightID = JSON.parse(flight.children[0].innerHTML);
     let request = await new Request('/api/FlightPlan/' + flightID);
     let response = await fetch(request);
     response = await response.json();
     let flightPlan = JSON.parse(JSON.stringify(response));
+    // display clicked flight filght details
     displayCurrentFlightPlan(flightPlan);
+    // remove any printed path from the map
     removeExistingPaths();
+    // print the path of the flight on the map
     printSegments(flightPlan);
+    // highlight the clicked flight marker
     changeFlightMarker(flightPlan);
+    // highlight the clicked flight in the list
     highlightFlight(flightPlan);
 }
 
+
+// show flight details
 async function displayCurrentFlightPlan(flightPlan) {
     try {
         let airline = flightPlan.company_name;
@@ -123,7 +135,7 @@ async function displayCurrentFlightPlan(flightPlan) {
     }
 }
 
-
+// remove flight details from the view
 function resetFlightPlanView() {
     try {
         let currentFlightPlan = document.getElementById('currentFlightPlan');
@@ -137,7 +149,7 @@ function resetFlightPlanView() {
 }
 
 
-
+// calculate the flight time of flight
 function getArrivalTime(segments) {
     let flightTime = 0;
     for (seg of segments) {
@@ -149,9 +161,40 @@ function getArrivalTime(segments) {
 
 function allowDrop(event) {
     event.preventDefault();
+    displayDragImage();
 }
 
+
+function displayDragImage() {
+    let flightListElement = document.getElementById("flightList");
+    let children = flightListElement.children;
+    for (i = 0; i < children.length; i++) {
+        children[i].style.display = 'none';
+    }
+    flightListElement.style.backgroundImage = "url(resources/dropzone.jpg)";
+    flightListElement.style.backgroundPosition = 'center';
+    flightListElement.style.backgroundSize = '190px 220px';
+    flightListElement.style.backgroundRepeat = 'no-repeat';
+}
+
+
+function dragLeave(event) {
+    event.preventDefault();
+    let flightListElement = document.getElementById("flightList");
+    let children = flightListElement.children;
+    for (i = 0; i < children.length; i++) {
+        children[i].style.display = 'initial';
+    }
+    flightListElement.style.backgroundImage = "initial";
+    flightListElement.style.backgroundPosition = 'center';
+    flightListElement.style.backgroundSize = '190px 220px';
+    flightListElement.style.backgroundRepeat = 'no-repeat';
+}
+
+
+// event when a file is dropped on flight list
 function drop(event) {
+    // try to read the file and create a new flight (or flights) from it
     try {
         event.preventDefault();
         let files = event.dataTransfer.files;
@@ -171,6 +214,7 @@ function drop(event) {
     }
 }
 
+// attemp to post a new flight from the files data using ajax
 async function postFlightFromFile(fileData) {
     try {
         let xhttp = new XMLHttpRequest();
@@ -192,6 +236,7 @@ async function postFlightFromFile(fileData) {
     }
 }
 
+// remove the error message from screen
 function removeErrorMsg(button) {
     document.getElementById('errorMsg').style.display = 'none';
     ///This is how you resume animation:
@@ -203,6 +248,7 @@ function removeErrorMsg(button) {
 }
 
 
+// highlight the given flight in the flight list
 function highlightFlight(flightPlan) {
     let FlightElement = document.getElementById(flightPlan.flight_id);
     FlightElement.style.border = '0.5px solid'
@@ -219,7 +265,7 @@ function highlightFlight(flightPlan) {
     currentlyHighlightedFlight = flightPlan;
 }
 
-
+// removes the highlight of of the flight that is currently highlighted
 function removeHighlight() {
     if (currentlyHighlightedFlight == null) {
         return;
@@ -232,7 +278,7 @@ function removeHighlight() {
     currentlyHighlightedFlight = null;
 }
 
-
+// sends a DELETE request of a flight from flight list using ajax
 async function deleteFlight(deleteButton, event) {
     try {
         event.stopPropagation();

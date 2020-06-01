@@ -65,6 +65,7 @@ function addMarker(props, newFlight) {
     }
 }
 
+// print flight path on map
 function printSegments(flightPlan) {
     try {
         var lineSymbol = {
@@ -105,6 +106,7 @@ function printSegments(flightPlan) {
 }
 
 
+// highlight flight marker (larger marker and yellow color)
 function changeFlightMarker(flightPlan) {
     try {
         var planeMarker = {
@@ -174,6 +176,7 @@ function removeUnactiveFlights(flightList) {
     }
 }
 
+// delete all existing flight paths from map
 function removeExistingPaths() {
     try {
         for (polyline of polylines) {
@@ -188,6 +191,7 @@ function removeExistingPaths() {
     }
 }
 
+// change back to original marker
 function resetPlaneMarker() {
     try {
         var planeMarker = {

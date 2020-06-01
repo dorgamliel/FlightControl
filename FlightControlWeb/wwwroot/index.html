@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="css/MyStyle.css">
 </head>
-<body ondrop="drop(event)" ondragover="allowDrop(event)">
+<body>
     <div id="errorMsg">
         <span id="errorTxt"></span>
         <button type="button" class="close" id="errMsgBtn" aria-label="Close" onclick="removeErrorMsg(this.parentElement)">
@@ -22,7 +22,7 @@
         <div id="map" class="col-sm"></div>
         <!--end of map element-->
         <!--flight list element-->
-        <div id="flightList" class="list-group col-sm" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div id="flightList" class="list-group col-sm" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
             <div id="listTitle">Active Flights</div>
             <div id="secondTitle" class="list-group-item list-group-item-dark dark">
                 <div id="leftTitle">Flight ID</div>
