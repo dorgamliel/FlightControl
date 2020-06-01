@@ -12,7 +12,7 @@ async function updateFlightList() {
         flightList = JSON.parse(JSON.stringify(response));
         printFlightList(flightList);
         removeUnactiveFlights(flightList);
-        setTimeout(updateFlightList, 3000);
+        setTimeout(updateFlightList, 1000);
     }
     catch {
         let errormsg = document.getElementById('errorTxt');
