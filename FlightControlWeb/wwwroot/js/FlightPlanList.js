@@ -16,7 +16,7 @@ async function updateFlightList() {
         printFlightList(flightList);
         // remove markers of unactive flights from map
         removeUnactiveFlights(flightList);
-        setTimeout(updateFlightList, 3000);
+        setTimeout(updateFlightList, 1000);
     }
     catch {
         let errormsg = document.getElementById('errorTxt');

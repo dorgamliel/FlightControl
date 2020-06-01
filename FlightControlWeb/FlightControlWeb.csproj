@@ -12,8 +12,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\out</OutputPath>
-    <WarningLevel>2</WarningLevel>
+    <OutputPath>../out/</OutputPath>
+    <WarningLevel>4</WarningLevel>
     <PlatformTarget></PlatformTarget>
   </PropertyGroup>
 
