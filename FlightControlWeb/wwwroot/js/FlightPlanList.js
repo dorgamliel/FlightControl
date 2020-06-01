@@ -180,15 +180,16 @@ function displayDragImage() {
 
 function dragLeave(event) {
     event.preventDefault();
+    restoreFlightListView();
+}
+
+function restoreFlightListView() {
     let flightListElement = document.getElementById("flightList");
     let children = flightListElement.children;
     for (i = 0; i < children.length; i++) {
         children[i].style.display = 'initial';
     }
     flightListElement.style.backgroundImage = "initial";
-    flightListElement.style.backgroundPosition = 'center';
-    flightListElement.style.backgroundSize = '190px 220px';
-    flightListElement.style.backgroundRepeat = 'no-repeat';
 }
 
 
@@ -197,6 +198,7 @@ function drop(event) {
     // try to read the file and create a new flight (or flights) from it
     try {
         event.preventDefault();
+        restoreFlightListView();
         let files = event.dataTransfer.files;
         let reader = new FileReader();
         reader.onload = function () {
