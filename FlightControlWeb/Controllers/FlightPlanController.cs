@@ -37,7 +37,6 @@ namespace FlightControlWeb.Controllers
             {
                 return flightPlan;
             }
-            //TODO: handle case where infinite loop may happen.
             var address = await Task.Run(() => FindFlightServer(id));
             var response = await Task.Run(() => GetFlightPlanFromExtServer(address, id));
             try
