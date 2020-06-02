@@ -1,0 +1,4 @@
+309825172, Alon Shoval
+312519176, Dor Gamliel
+
+In this solution we created 1 unit test using a mock database which is meant to check the get by id method of the flighplan controller.
