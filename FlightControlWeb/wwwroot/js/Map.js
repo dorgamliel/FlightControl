@@ -1,6 +1,6 @@
 ﻿let polylines = []
 
-function initMapM () {
+function initMap () {
   try {
     // Map properties.
     const properties = {
